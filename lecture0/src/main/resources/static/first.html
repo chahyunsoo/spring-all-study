@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>나의 포트폴리오</title>
+  <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: pink;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .main {
+            margin: 40px;
+            flex-grow: 1;
+        }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .footer {
+            background-color: pink;
+            color: white;
+            text-align: center;
+            padding-bottom: 30px;
+        }
+
+        @media (max-width: 600px) {
+            .main {
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+  <h1>나의 포트폴리오</h1>
+</div>
+
+<div class="main">
+  <div class="section">
+    <h2>프로젝트</h2>
+    <p>
+      <a href="/spring">Lecture0</a>
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>자기소개</h2>
+    <p>자기소개에 대한 내용이 들어갈 부분입니다.</p>
+  </div>
+
+  <div class="section">
+    <h2>연락처</h2>
+    <p>연락처 정보가 들어갈 부분입니다.</p>
+  </div>
+</div>
+
+<div class="footer">
+  <p>© 2023 나의 포트폴리오. 모든 권리 보유.</p>
+</div>
+</body>
+</html>
