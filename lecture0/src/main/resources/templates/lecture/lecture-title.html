@@ -1,0 +1,21 @@
+<!--<!DOCTYPE HTML>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--  <title>Hello</title>-->
+<!--  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />-->
+<!--</head>-->
+<!--<body>-->
+<!--<p th:text="'강의 제목: ' + ${title} + '(진행중)'" ></p>-->
+<!--&lt;!&ndash;<p>(진행중)</p>&ndash;&gt;-->
+<!--</body>-->
+<!--</html>-->
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Hello</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<p><a th:text="'강의 제목: ' + ${title} + '(진행중)'" th:href="@{/lecture-number(step=${step})}"></a></p>
+</body>
+</html>
