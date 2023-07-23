@@ -1,15 +1,16 @@
 package spring.lecture0.repository;
 
+import org.springframework.stereotype.Repository;
 import spring.lecture0.domain.Member;
 
 import java.util.*;
 
+@Repository
 public class MemoryMemberRepository implements MemberRepository {
     private static Map<Long, Member> store = new HashMap<>();  //공유되는 변수일때, 동시성 문제 발생 가능하긴 함
     private static long sequence = 0L;
 
     @Override
-
     public Member save(Member member) {
         member.setId(++sequence);
         store.put(member.getId(), member);
