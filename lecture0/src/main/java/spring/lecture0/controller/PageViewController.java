@@ -31,7 +31,7 @@ public class PageViewController {
         return "lecture/lecture-number";
     }
 
-    @GetMapping("lecture  -date")
+    @GetMapping("lecture-date")
     @ResponseBody //Response 응답 Body부분에 직접 넣어주겠다
     public String lectureDate(@RequestParam(value = "practicedDate", required = false) String date) {
         return "강의 수강 Month: " + date;
@@ -53,6 +53,12 @@ public class PageViewController {
     static class LecApi {
         private String name;
     }
+
+    @GetMapping("sign")
+    public String sign() {
+        return "sign.html";
+    }
+
 
 }
 

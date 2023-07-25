@@ -9,11 +9,16 @@ import spring.lecture0.repository.MemoryMemberRepository;
 import java.util.List;
 import java.util.Optional;
 
-@Service
+
 public class MemberService {
     private final MemberRepository memberRepository;
 
+    /*
     @Autowired
+    public MemberService(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
+    */
     public MemberService(MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
@@ -24,6 +29,7 @@ public class MemberService {
     */
     public Long join(Member member) {
         checkDuplicatedMember(member);
+//        Member save = memberRepository.save(member);  member같은 객체여서 굳이???이렇게??그냥 member매개변수 이용해
         memberRepository.save(member);
         return member.getId();
     }
