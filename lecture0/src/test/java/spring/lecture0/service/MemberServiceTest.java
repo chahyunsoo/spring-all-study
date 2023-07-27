@@ -34,8 +34,7 @@ class MemberServiceTest {
     }
     @Test
     @DisplayName("회원가입 Test")
-
-    void join() {
+    void join() throws Exception{
         //given
         Member member = new Member();
         member.setName("son");
@@ -54,7 +53,7 @@ class MemberServiceTest {
 
     @Test
     @DisplayName("중복 회원 예외 발생")
-    public void joinException() {
+    public void joinException() throws Exception{
         //given
         Member member1 = new Member();
         member1.setName("son");

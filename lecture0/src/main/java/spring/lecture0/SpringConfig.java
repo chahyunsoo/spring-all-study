@@ -1,14 +1,27 @@
 package spring.lecture0;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import spring.lecture0.controller.MemberController;
+import spring.lecture0.repository.JdbcMemberRepository;
+import spring.lecture0.repository.JdbcTemplateMemberRepository;
 import spring.lecture0.repository.MemberRepository;
 import spring.lecture0.repository.MemoryMemberRepository;
 import spring.lecture0.service.MemberService;
 
+import javax.sql.DataSource;
+
 @Configuration
 public class SpringConfig {
+
+    private DataSource dataSource;
+
+    @Autowired
+    public SpringConfig(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
 
     @Bean //스프링 빈에 등록하라는 뜻이네??
     public MemberService memberService() {
@@ -17,7 +30,10 @@ public class SpringConfig {
 
     @Bean
     public MemberRepository memberRepository() {
-        return new MemoryMemberRepository();
+//        return new MemoryMemberRepository();
+//        return new JdbcMemberRepository(dataSource);
+        return new JdbcTemplateMemberRepository(dataSource);
+
     }
 
     /*

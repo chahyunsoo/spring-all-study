@@ -25,6 +25,8 @@ dependencies {
 	testAnnotationProcessor 'org.projectlombok:lombok'  //Test 코드에서 Lombok annotation을 처리하려면 필요
 	testImplementation 'org.projectlombok:lombok'       //Test 코드가 Lombok 라이브러리를 사용하도록 지시
 
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	runtimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {
