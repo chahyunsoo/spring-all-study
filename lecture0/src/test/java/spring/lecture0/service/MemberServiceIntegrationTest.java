@@ -50,6 +50,7 @@ class MemberServiceIntegrationTest {
                 () -> memberService.join(member2));
         String resultMessage = e.getMessage();
         System.out.println(resultMessage);
+
         //then
         assertThat(resultMessage).isEqualTo("동일한 이름을 가지고 있는 회원이 존재");
     }

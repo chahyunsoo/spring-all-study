@@ -6,10 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import spring.lecture0.controller.MemberController;
-import spring.lecture0.repository.JdbcMemberRepository;
-import spring.lecture0.repository.JdbcTemplateMemberRepository;
-import spring.lecture0.repository.MemberRepository;
-import spring.lecture0.repository.MemoryMemberRepository;
 import spring.lecture0.repository.*;
 import spring.lecture0.service.MemberService;
 
@@ -17,13 +13,6 @@ import javax.sql.DataSource;
 
 @Configuration
 public class SpringConfig {
-
-
-//    private DataSource dataSource;
-
-//    @Autowired
-//    public SpringConfig(DataSource dataSource) {
-//        this.dataSource = dataSource;
 
 //    private DataSource dataSource;
 
@@ -50,8 +39,8 @@ public class SpringConfig {
 //        return new MemoryMemberRepository();
 //        return new JdbcMemberRepository(dataSource);
 //        return new JdbcTemplateMemberRepository(dataSource);
-//        return new JdbcTemplateMemberRepository(dataSource);
         return new JpaMemberRepository(entityManager);  //EntityManager가 필요했었다.
+
     }
 
     /*
