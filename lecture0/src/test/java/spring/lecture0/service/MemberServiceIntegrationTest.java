@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import spring.lecture0.domain.Member;
 import spring.lecture0.repository.MemberRepository;
@@ -19,6 +20,7 @@ class MemberServiceIntegrationTest {
     @Autowired MemberRepository memberRepository;   //구현체는 SpringConfig에서 올라온다.
 
     @Test
+    @Commit //커밋하여 DB에 반영하고 롤백됨
     @DisplayName("회원가입 Test")
     void join() throws Exception {
         //given
@@ -47,6 +49,7 @@ class MemberServiceIntegrationTest {
         IllegalStateException e = assertThrows(IllegalStateException.class,
                 () -> memberService.join(member2));
         String resultMessage = e.getMessage();
+        System.out.println(resultMessage);
 
         //then
         assertThat(resultMessage).isEqualTo("동일한 이름을 가지고 있는 회원이 존재");

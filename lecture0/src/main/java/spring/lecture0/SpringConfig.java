@@ -1,13 +1,12 @@
 package spring.lecture0;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import spring.lecture0.controller.MemberController;
-import spring.lecture0.repository.JdbcMemberRepository;
-import spring.lecture0.repository.JdbcTemplateMemberRepository;
-import spring.lecture0.repository.MemberRepository;
-import spring.lecture0.repository.MemoryMemberRepository;
+import spring.lecture0.repository.*;
 import spring.lecture0.service.MemberService;
 
 import javax.sql.DataSource;
@@ -15,11 +14,18 @@ import javax.sql.DataSource;
 @Configuration
 public class SpringConfig {
 
-    private DataSource dataSource;
+//    private DataSource dataSource;
 
+//    @PersistenceContext 원래는 이렇게 받야도 됨.
+    private EntityManager entityManager;
+
+//    @Autowired
+//    public SpringConfig(DataSource dataSource) {
+//        this.dataSource = dataSource;
+//    }
     @Autowired
-    public SpringConfig(DataSource dataSource) {
-        this.dataSource = dataSource;
+    public SpringConfig(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
 
@@ -32,7 +38,8 @@ public class SpringConfig {
     public MemberRepository memberRepository() {
 //        return new MemoryMemberRepository();
 //        return new JdbcMemberRepository(dataSource);
-        return new JdbcTemplateMemberRepository(dataSource);
+//        return new JdbcTemplateMemberRepository(dataSource);
+        return new JpaMemberRepository(entityManager);  //EntityManager가 필요했었다.
 
     }
 
