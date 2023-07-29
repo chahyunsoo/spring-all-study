@@ -3,6 +3,7 @@ package spring.lecture0;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import spring.lecture0.aop.TimeTraceAop;
 import spring.lecture0.repository.*;
 import spring.lecture0.service.MemberService;
 
@@ -58,6 +59,12 @@ public class SpringConfig {
 //    }
 //    이런 느낌이지만 Controller는 클래스에 @Controller 어노테이션을 그대로 둬야 하기에
 //    이 코드를 작성할 필요가 없다.
+
+
+    @Bean
+    public TimeTraceAop timeTraceAop() {
+        return new TimeTraceAop();
+    }
 }
 
 

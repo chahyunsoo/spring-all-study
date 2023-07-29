@@ -10,7 +10,7 @@ import spring.lecture0.repository.MemoryMemberRepository;
 import java.util.List;
 import java.util.Optional;
 
-@Transactional  //JpaMemberRepository에서 데이터를 저장하고 변경하고 했기 때문에 @Transactional을 써줘야함.
+//JpaMemberRepository에서 데이터를 저장하고 변경하고 했기 때문에 @Transactional을 써줘야함.
 /*
 어노테이션을 사용하면, 메서드나 클래스에 트랜잭션을 적용할 수 있다.
 어노테이션을 메서드에 적용하면 해당 메서드가 실행될 때 트랜잭션을 시작하고,
@@ -18,6 +18,7 @@ import java.util.Optional;
 메서드에서 예외가 발생하면 트랜잭션을 롤백(Rollback)해서
 이전 상태로 돌리는 기능을 제공함.
 */
+@Transactional
 public class MemberService {
     private final MemberRepository memberRepository;
 
