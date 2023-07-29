@@ -20,7 +20,7 @@ class MemberServiceIntegrationTest {
     @Autowired MemberRepository memberRepository;   //구현체는 SpringConfig에서 올라온다.
 
     @Test
-    @Commit //커밋하여 DB에 반영하고 롤백됨
+//    @Commit //커밋하여 DB에 반영하고 롤백됨
     @DisplayName("회원가입 Test")
     void join() throws Exception {
         //given
