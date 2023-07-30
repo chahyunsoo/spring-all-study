@@ -41,7 +41,7 @@ public class MemberService {
 //        Member save = memberRepository.save(member);  member같은 객체여서 굳이???이렇게??그냥 member매개변수 이용해
         memberRepository.save(member);
         System.out.println("멤버 저장 완료!!!");
-        return member.getId();
+        return member.getId();  //그냥 임의로...
     }
 
     //중복 체크하는 로직을 따로 메소드로 뺌, refactoring 진행함
