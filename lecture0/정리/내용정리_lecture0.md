@@ -219,7 +219,7 @@ public class MemberService {
 또 MemberService도 아까 코드들을 봐보면, MemberRepository가 필요하다.
 그래서 위의 MemberService 코드의 생성자에 @Autowired를 붙이면 된다.
 
-*중요: 스프링 컨테이너에 올란간 것들만 @Autowired가 동작한다.
+*중요: 스프링 컨테이너에 올라간 것들만 @Autowired가 동작한다.
  
 MemberController와 MemberService를 연결시켜줘야 한다면, @Autowired를 사용하면 된다는 소리이다.
 ```java
@@ -272,7 +272,7 @@ public class SpringConfig {
 스프링 빈에 MemberService와 MemberRepository가 등록이 되고(스프링이 올라올때 @Bean을 보고 memberService()와 memberRepository()를 스프링 빈에 올려준다)
 그러면서 스프링 빈에 등록되어 있는 memberRepository()를 MemberService()의 인자에 넣어준다.
 
-그러나 컨트롤러는 어찌 설정을 할 수 있는 부분이 아니니 컴포넌트 스캔 방식(@Controller,@Autowired)으로 그대로 유지한다.
+그러나 컨트롤러는 어찌 설정을 할 수 있는 부분이 아니니 컴포넌트 스캔 방식(@Controller,@Autowired)으로 그대로 유지한다.(컴포넌트가 붙지 않은 것들은 컴포넌트 어노테이션과 @Autowired를 지워줌)
 그러면 MemberController(MemberService memberService) { } 에서 memberService에 내가 SpringConfig 클래스에서 빈으로 등록한
 memberService를 넣어준다.
 
@@ -285,8 +285,7 @@ memberService를 넣어준다.
   결과값이 스프링 컨테이너에 등록됨
   2. 이렇게 함으로써 MemberService 인스턴스와 MemoryMemberRepository 인스턴스가 
   각각 MemberService 타입과 MemberRepository 타입의 빈으로 스프링 컨테이너에 등록됨
-  3. MemberController 클래스가 생성되는 시점에 스프링이 
-  4. 어노테이션을 발견하고 이를 처리
+  3. MemberController 클래스가 생성되는 시점에 스프링이 어노테이션을 발견하고 이를 처리
   4. 스프링은 MemberController의 생성자를 호출할 때, 생성자의 매개변수로 필요한 MemberService 타입의 객체를 스프링 컨테이너에서 찾습니다. MemberService 타입의 빈이 스프링 컨테이너에 등록되어 있으므로, 이 빈을 MemberController의 생성자에 주입하여 MemberController 객체를 생성. 
   이를 통해 MemberController와 MemberService가 연결
 
