@@ -24,7 +24,7 @@ public class OrderApp {
         
 //        스프링 빈을 이용한 것
         ApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
-        MemberService memberService = applicationContext.getBean("memberService", MemberService.class);
+        MemberService memberService = applicationContext.getBean("memberService", MemberService.class); //이름, 타입
         OrderService  orderService = applicationContext.getBean("orderService", OrderService.class);
 
 
