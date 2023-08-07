@@ -22,6 +22,8 @@ public class MemberApp {
         //아래 코드는 이름은 memberService이고 타입은 MemberService이다 라는 것을 명시하고 찾으면 된다.
         MemberService memberService = applicationContext.getBean("memberService", MemberService.class);
 
+        System.out.println("memberService = " + memberService);
+
 
         Member member1 = new Member(1L, "choi", Grade.VIP);
 

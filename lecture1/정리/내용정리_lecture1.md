@@ -286,7 +286,199 @@ public MemberRepository memberRepository() {
 
 ---
 
-### 스프링 빈 설정 메타 정보
+### 싱글톤
+
+-  아래의 코드처럼 스프링이 적용되지 않은 순수한 DI 컨테이너인 AppConfig는 요청을 받을 때마다 빈의 객체를 
+직접 생성한다.  
+```java
+    @Test
+    @DisplayName("스프링 없는 순수한 DI 컨테이너")
+    void NoSpringContainer() {
+        AppConfig appConfig = new AppConfig();
+        //1. 조회: 호출할 때 마다 객체를 생성
+        MemberService memberService1 = appConfig.memberService();
+        //2. 조회: 호출할 때 마다 객체를 생성
+        MemberService memberService2 = appConfig.memberService();
+
+        //참조값이 다른 것을 확인
+        assertThat(memberService1).isNotSameAs(memberService2);
+    }
+```
+
+- 하지만 이러한 방식은 예를 들어,TPS(Transactino per Second)가 1000이면 적어도
+1000개의 객체는 생성된다.(이러면 당연히 부담이 되니까..)
+- 그래서 이 문제에 대한 해결방안은 `싱글톤 패턴`을 사용하여 객체가 1개만 생성되고,
+이 생성된 1개의 객체를 공유하면 된다.
+- 싱글톤 패턴이란, 클래스의 인스턴스가 딱 1개만 생성되는 것을 보장하는 디자인 패턴이다.
+- 그래서 객체 인스턴스를 2개 이상 생성하지 못하도록 막아야 한다.
+- 그려면 2개 이상 생성하지 못하도록 어떻게 막냐? -> private 생성자를 사용해서 외부에서 임의로 'new 키워드'를 사용하여 객체를 생성하지 못하도록 한다.
+
+```java
+public class SingletonService {
+    
+    //1.
+    private static final SingletonService instance = new SingletonService();
+
+    //2.
+    public static SingletonService getInstance() {
+        return instance;
+    }
+
+    //3.
+    private SingletonService() { }
+
+    public void logic() {
+        System.out.println("싱글톤 객체를 호출하였음");
+    }
+}
+```
+
+1. static 영역에 객체 instance를 하나 생성해 올린다.
+2. 어디서 이 객체 인스턴스가 필요하면 생성해놓은 getInstance() 메소드를 이용하여 조회할 수 있다. 이 메소드를 호출하면 <b>항상</b> 같은 인스턴스를 반환한다.
+3. 오로지 1개의 객체 인스턴스만 존재해야 하기 때문에, 생성자의 접근 제어자를 `private`으로 막아주어, 만약 외부에서 'new'를 통해 객체 인스턴스를 생성하는 것을
+막아준다.
+
+위와 같이 싱글톤 패턴을 이용하여 객체를 생성한다면, 몇번이나 객체를 생성하여도 그 객체는 같은 객체들이다.
+```java
+    @Test
+    @DisplayName("Singleton 패턴을 사용하여 객체 사용")
+    void singletonServiceTest(){
+            SingletonService singletonService1=SingletonService.getInstance();
+            SingletonService singletonService2=SingletonService.getInstance();
+
+            System.out.println("singletonService1 = "+singletonService1);
+            System.out.println("singletonService2 = "+singletonService2);
+
+            System.out.println(singletonService1==singletonService2);
+            assertThat(singletonService1).isEqualTo(singletonService2);
+            assertThat(singletonService1).isSameAs(singletonService2);
+}
+[실행결과]
+singletonService1 = spring.lecture1.singleton.SingletonService@701fc37a
+singletonService2 = spring.lecture1.singleton.SingletonService@701fc37a
+true
+```
+- assertThat(singletonService1).isEqualTo(singletonService2);  
+-> equals메소드와 같은 표현 
+- assertThat(singletonService1).isSameAs(singletonService2);    
+-> == 와 같은 표현
+
+그러나 싱글톤 패턴에 문제점이 있다.
+- 싱글톤 패턴을 구현하는 코드 자체가 많이 들어간다.
+- 의존관계상 클라이언트가 구체 클래스에 의존한다. ->DIP를 위반
+- 클라이언트가 구체 클래스에 의존하기 때문에 OCP 원칙을 위반할 수 있다.
+- 테스트하기 어렵다
+- private 생성자여서 자식 클래스를 만들기가 어렵다.
+- 유연성이 떨어진다
+
+객체를 1개만 생성하여서 공유한다는 확실한 장점이 있는데도 불구하고 단점이 너무 많은데....?
+하지만 스프링 프레임워크는 이 싱글톤 패턴의 문제점을 전부 다 해결하고, 객체를 싱글톤으로 관리해준다.
+
+---
+
+### 싱글톤 컨테이너
+
+- 스프링 컨테이너는 싱글톤 패턴의 문제점을 해결하면서, 객체 인스턴스를 싱글톤(1개만 생성)으로 관리한다.
+  - 즉, 바로 직전에 사용했던 싱글톤 패턴을 위한 지저분한 코드(싱글톤 패턴 적용)를 직접 작성하지 않고도, 스프링 컨테이너는 객체 인스턴스를
+      싱글톤으로 관리한다.
+  - DIP, OCP, 테스트, private 생성자로부터 자유로워진다.
+- 지금까지 잘 사용해왔던 AppConfig클래스의 @Bean 어노테이션을 통해 등록된 빈들도 싱글톤으로 관리된다.
+- 스프링 컨테이너는 싱글톤 컨테이너의 역할을 하는 것이다. 싱글톤 객체를 생성하고 관리하는 기능을 싱글톤 레지스트리라고 부른다.
+- 그래서 앞에서 봤던 여러 가지의 싱글톤 패턴의 단점을 전부 해결하고 객체 인스턴스를 싱글톤으로 관리한다.
+
+싱글톤 컨테이너를 적용하게 되면, 앞서 싱글톤 패턴의 장점인 객체를 한개만 생성하여,이 이미 만들어진 객체를 공유하는 방식으로 효율적으로 재사용할 수 있게 된다.
+  - 참고: 스프링의 기본 빈 등록 방식은 싱글톤이지만, 싱글톤 방식만 지원하는 것은 아니며, 요청할 때 마다 새로운 객체를 생성해서 반환하는 기능도 제공한다.(하지만 거의 싱글톤으로 씀)
+
+---
+
+### 싱글톤 방식의 주의점
+ 
+- 싱글톤 패턴이든, 스프링 컨테이너(싱글톤 컨테이너)든 객체 인스턴스를 하나만 생성해서 공유하는 방식은 여러 클라이언트가 하나의 같은 객체를
+공유하기 때문에 싱글톤 객체는 상태를 유지하게 하면 안된다.
+- 즉, 무상태로 설계해야 한다.
+  - 특정 클라이언트에 의존적인 필드가 있으면 안된다.
+  - 특정 클라이언트가 필드를 변경할 수 없어야 하며, 오로지 Read-Only!
+  - 필드 대신에, 공유되지 않는 변수, 지역변수, 파라미터, ThreadLocal(일반 변수의 수명은 특정 코드 블록(예, 메서드 범위, for 블록 범위 등) 범위 내에서만 유효) 등을 사용해야 한다.
+
+```java
+public class StatefulService {
+    private int price; //상태를 유지하는 필드
+
+    public void order(String name,int price) {
+        System.out.println("name = " + name + "price = " + price);
+        this.price = price;  //이 부분이 문제!!!
+    }
+
+    public int getPrice() {
+        return price;
+    }
+}
+```
+현재 price라는 상태를 유지하는 필드가 존재, order메소드를 통해서 공유 변수 order를 세팅할 수 있다.
+
+```java
+    @Test
+    @DisplayName("stateful 테스트")
+    void statefulServiceSingletonTest() {
+        ApplicationContext ac = new AnnotationConfigApplicationContext(TestConfig.class);
+        StatefulService statefulService1 = ac.getBean("statefulService", StatefulService.class);
+        StatefulService statefulService2 = ac.getBean("statefulService", StatefulService.class);
+        
+        /*
+        * 2개의 고객의 요청이 왔다고 가정
+        * USER_1이 주문을 하고 getPrice()를 통해 주문 금액을 조회 하려 하는데,
+        * 그 순간 USER_2가 주문을 하는 상황
+        * 그러면 USER_1이 주문 금액을 조회 하면 얼마가 나올까?  -->20000
+        * 이러명 망함.
+        * */
+
+        //Thread 1: 1번 사용자가 10000원을 주문함
+        statefulService1.order("USER_1", 10000);
+        //Thread 2: 2번 사용자가 10000원을 주문함
+        statefulService2.order("USER_2", 20000);
+
+        //Thread 1: 1번 사용자 주문 금액을 조회함
+        int price = statefulService1.getPrice();
+        assertThat(statefulService1.getPrice()).isEqualTo(20000);  //Thread 2가 바꿔 치기 하기 때문에,,, 망한 테스트
+    }
+
+    static class TestConfig {
+        @Bean
+        public StatefulService statefulService() {
+            return new StatefulService();
+        }
+    }
+}
+```
+위의 테스트를 보면, Thread 1번이 주문을 하고 주문 금액을 조회 하려고 하지만 그 사이 Thread 2가 주문을 하는 바람에 공유 변수 price가 10000원에서 20000원으로 바뀜.
+현재 StatefulService의 price변수는 특정 클라이언트가 값을 변경할 수 있는 stateful한 상태이다. 그렇기 때문에 스프링 빈은 항상 stateless하게 설계 해야 한다.
+
+그러면 stateless하게 설계해야 한다는 것은 어떻게 설계한다는 것인가?
+<br>-> price를 공유 변수로 설정하지 않고 지역변수로 order 메소드의 반환값으로 price를 반환하게 하면 된다.
+```java
+//  private int price;
+  
+    public void order(String name,int price) {
+        System.out.println("name = " + name + "price = " + price);
+//        this.price = price;  //이 부분이 문제!!!
+        return price;
+    }
+```
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
