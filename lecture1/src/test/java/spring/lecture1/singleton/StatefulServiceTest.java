@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -27,7 +28,7 @@ class StatefulServiceTest {
         /*
         * 2개의 고객의 요청이 왔다고 가정
         * USER_1이 주문을 하고 getPrice()를 통해 주문 금액을 조회 하려 하는데,
-        * 그 순간 USER_2가 주문을 하는 상황
+         * 그 순간 USER_2가 주문을 하는 상황
         * 그러면 USER_1이 주문 금액을 조회 하면 얼마가 나올까?  -->20000
         * 이러명 망함.
         * */
@@ -41,7 +42,13 @@ class StatefulServiceTest {
         int price = statefulService1.getPrice();
         System.out.println("price = " + price);
 
+
         assertThat(statefulService1.getPrice()).isEqualTo(20000);  //Thread 2가 바꿔 치기 하기 때문에,,, 망한 테스트
+
+//        @Configuration 바이트 코드 조작 확인용
+//        ApplicationContext ac1 = new AnnotationConfigApplicationContext(TestConfig.class);
+//        TestConfig bean = ac1.getBean(TestConfig.class);
+//        System.out.println("bean = " + bean.getClass());
     }
 
     static class TestConfig {

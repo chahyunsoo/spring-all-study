@@ -18,4 +18,10 @@ public class MemberServiceImpl implements MemberService {
     public Member findMember(Long memberId) {
         return memberRepository.findById(memberId);
     }
+
+    //테스트용: memberRepository에 무슨 객체가 들어있는지 반환
+    public MemberRepository getMemberRepository() {
+        return memberRepository;
+    }
 }
+

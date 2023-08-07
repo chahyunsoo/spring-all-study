@@ -79,7 +79,7 @@ public class AppConfig {
 19:31:33.520 [main] DEBUG o.s.b.f.s.DefaultListableBeanFactory -- Creating shared instance of singleton bean 'org.springframework.context.event.internalEventListenerFactory'
 19:31:33.521 [main] DEBUG o.s.b.f.s.DefaultListableBeanFactory -- Creating shared instance of singleton bean 'org.springframework.context.annotation.internalAutowiredAnnotationProcessor'
 19:31:33.521 [main] DEBUG o.s.b.f.s.DefaultListableBeanFactory -- Creating shared instance of singleton bean 'org.springframework.context.annotation.internalCommonAnnotationProcessor'
-//위에 5개는 스프링이 내부적으로 필요해서 등록하는 스픠링 Bean
+//위에 5개는 스프링이 내부적으로 필요해서 등록하는 스프링 Bean
         
 19:30:27.105 [main] DEBUG o.s.b.f.s.DefaultListableBeanFactory -- Creating shared instance of singleton bean 'appConfig'
 19:30:27.108 [main] DEBUG o.s.b.f.s.DefaultListableBeanFactory -- Creating shared instance of singleton bean 'memberService'
@@ -451,7 +451,7 @@ public class StatefulService {
 }
 ```
 위의 테스트를 보면, Thread 1번이 주문을 하고 주문 금액을 조회 하려고 하지만 그 사이 Thread 2가 주문을 하는 바람에 공유 변수 price가 10000원에서 20000원으로 바뀜.
-현재 StatefulService의 price변수는 특정 클라이언트가 값을 변경할 수 있는 stateful한 상태이다. 그렇기 때문에 스프링 빈은 항상 stateless하게 설계 해야 한다.
+현재 StatefulService의 price변수는  특정 클라이언트가 값을 변경할 수 있는 stateful한 상태이다. 그렇기 때문에 스프링 빈은 항상 stateless하게 설계 해야 한다.
 
 그러면 stateless하게 설계해야 한다는 것은 어떻게 설계한다는 것인가?
 <br>-> price를 공유 변수로 설정하지 않고 지역변수로 order 메소드의 반환값으로 price를 반환하게 하면 된다.
@@ -467,6 +467,160 @@ public class StatefulService {
 
 ---
 
+### @Configuration과 싱글톤
+
+```java
+@Configuration
+public class AppConfig {
+
+  @Bean
+  public MemberService memberService() {
+    return new MemberServiceImpl(memberRepository());
+  }
+
+  @Bean
+  public MemberRepository memberRepository() {
+    return new MemoryMemberRepository();
+  }
+
+  @Bean
+  public DiscountPolicy discountPolicy() {
+    //        return new FixDiscountPolicy();
+    return new RateDiscountPolicy();
+  }
+
+  @Bean
+  public OrderService orderService() {
+    return new OrderServiceImpl(memberRepository(), discountPolicy());
+  }
+}
+```
+
+- memberService 빈을 만드는 코드를 보면 `memberRepository()` 를 호출 
+  - 이 메서드를 호출하면 `new MemoryMemberRepository()` 를 호출
+- orderService 빈을 만드는 코드도 동일하게 `memberRepository()` 를 호출 
+  - 이 메서드를 호출하면 `new MemoryMemberRepository()` 를 호출
+
+이걸 보면 MemoryMemberRepository를 두 번 호출하면서 생성하는데 이러면 싱글톤이 깨지는거 아니야? 라고 생각했다.
+사실은 어떠 할지 테스트를 통해서 검증해보자.
+```java
+    @Test
+    void ConfigurationTest() {
+        ApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
+
+        MemberServiceImpl memberService = ac.getBean("memberService", MemberServiceImpl.class);
+        OrderServiceImpl orderService = ac.getBean("orderService", OrderServiceImpl.class);
+        MemberRepository memberRepository = ac.getBean("memberRepository", MemberRepository.class);
+
+        MemberRepository memberRepository1 = memberService.getMemberRepository();
+        MemberRepository memberRepository2 = orderService.getMemberRepository();
+
+        System.out.println("memberService에서 -> memberRepository = " + memberRepository1);
+        System.out.println("memberService에서 -> memberRepository = " + memberRepository2);
+        System.out.println("memberRepository = " + memberRepository);
+
+}
+[실행결과]
+memberService에서 -> memberRepository = spring.lecture1.member.MemoryMemberRepository@54e22bdd
+memberService에서 -> memberRepository = spring.lecture1.member.MemoryMemberRepository@54e22bdd
+memberRepository = spring.lecture1.member.MemoryMemberRepository@54e22bdd
+```
+실행 결과에서 알 수 있듯이, 모두 똑같은 객체를 출력하였다. 즉 memberRepository는 공유되어 사용된다.
+
+그런데 AppConfig를 보면, memberService빈을 등록하면서 memberRepository()를 호출,
+memberRepository빈을 등록하면서 또 memberRepository()가 호출, orderService빈을 등록하면서 또 memberRepository()를 호출하는데, 이러면 3번 호출이 되는 것인가? 
+AppConfig에 출력문을 만들어서 테스트해보자.
+  - 1. 스프링 컨테이너가 스프링 빈에 등록하기 위해 @Bean이 붙어있는 `memberRepository()` 호출
+  - 2. memberService() 로직에서 `memberRepository()` 호출
+  - 3. orderService() 로직에서 `memberRepository()` 호출
+
+```java
+ @Configuration
+ public class AppConfig {
+     @Bean
+     public MemberService memberService() {
+    //1번
+    System.out.println("call AppConfig.memberService"); return new MemberServiceImpl(memberRepository());
+    }
+     @Bean
+     public OrderService orderService() {
+     //1번
+     System.out.println("call AppConfig.orderService"); return new OrderServiceImpl(memberRepository(), discountPolicy());
+    }
+     @Bean
+     public MemberRepository memberRepository() {
+     //2번? 3번?
+     System.out.println("call AppConfig.memberRepository"); return new MemoryMemberRepository();
+    }   
+     @Bean
+     public DiscountPolicy discountPolicy() {
+         return new RateDiscountPolicy();
+     }
+}
+[실행결과]
+call AppConfig.memberService 
+call AppConfig.memberRepository 
+call AppConfig.orderService
+```
+결과는 모두 한 번씩 출력되는데 어떻게 된 것일까?
+
+---
+ 
+### @Configuration & 바이트 코드 조작
+
+앞서 memberRepository가 3번이 호출되길 기대했지만 한번만 호출되었다.
+```java
+    @Test
+    void configurationDeep() {
+        ApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);  //AppConfig도 스프링 빈으로 등록이 되니까
+        AppConfig bean = ac.getBean(AppConfig.class);
+
+        System.out.println("bean = " + bean.getClass()); 
+    }
+```
+위의 코드의 출력 값은 `bean = class spring.lecture1.AppConfig$$SpringCGLIB$$0` 이렇다.
+순수한 클래스라면 `class hello.core.AppConfig` 라고 출력이 되야 하는데, CGLIB가 붙으면서 뭔가 복잡해보인다.
+CGLIB가 붙은 AppConfig는 내가 만든 구성 정보 클래스가 아닌, 스프링이 CGLIB라는 바이트 조작 라이브러리를 이용하여
+내가 만든 AppConfig를 상속받는 임의의 다른 클래스를 만들고, 그 다른 클래스를 스프링 빈으로 등록한 것이다.
+이 등록된 빈은 이름도 appConfig이다. 바로 이 임의의 다른 클래스가 싱글톤임을 보장해준다.
+@Bean이 붙은 메서드마다 if.`이미 스프링 빈이 존재하면 존재하는 빈을 반환하고`, 
+else.`스프링 빈이 없으면 생성해서 스프링 빈으로 등록하고 반환하는 코드가 동적으로 만들어진다.` 
+이 덕분에 싱글톤이 보장되는 것이다.
+
+#### @Configuration을 쓰지 않고 메소드 위에 @Bean 어노테이션만 있으면 어떻게 될까?
+
+AppConfig클래스의 @Configuration 어노테이션을 주석 처리하고,
+바로 위에서 돌렸던 테스트를 다시 돌려보았다. 결과는 이렇다
+```java
+[실행결과]
+call AppConfig.memberService
+call AppConfig.memberRepository
+call AppConfig.memberRepository
+call AppConfig.orderService 
+call AppConfig.memberRepository
+        
+bean = class spring.lecture1.AppConfig
+```
+이전에 @Configuration 어노테이션을 붙였을 때는 CGLIB에 의해 싱글톤이 보장되어 call 출력문이 총 3번만 출력되었다. 
+하지만 @Configuration 어노테이션을 제거하니 싱글톤이 보장되지 않았는지, call 출력문이 총 5번 출력되었고,
+get.Class()의 결과도 이전과는 다르게 내가 만든 AppConfig클래스이다.
+"call AppConfig.memberRepository" 3번이 출력된 이유는 싱글톤이 보장되지 않아서인데,
+첫번 째로 @Bean에 의해 생성된 memberRepository, 두번 째와 세번 째는 memberRepository가 인자로 다른 빈이 생성될 때 
+인자로 들어갔기 때문이다.
+
+마지막으로 인스턴스가 같은지 이전에 싱글톤이 보장되었을때 똑같은 객체를 출력했었던 테스트를 그대로 다시 실행해 보았다.
+```java
+[실행결과]
+memberService에서 -> memberRepository = spring.lecture1.member.MemoryMemberRepository@6f3c660a
+orderService에서 -> memberRepository = spring.lecture1.member.MemoryMemberRepository@74f5ce22
+memberRepository = spring.lecture1.member.MemoryMemberRepository@25aca718
+```
+- memberService가 참조하는 memberRepository는 @6f3c~~~~
+- orderService가 참조하는 memberRepository는 @74f5~~~~
+- 실제 스프링 컨테이너에 등록되는 memberRepository는 @25aca~~~~
+
+즉, 실행결과에서 볼 수 있듯이, @Configuration 어노테이션이 없어지면 CGLIB 바이트 조작 라이브러리를 사용하지 않아
+싱글톤임을 보장할 수 없다.
 
 
 
@@ -476,6 +630,7 @@ public class StatefulService {
 
 
 
+ 
 
 
 

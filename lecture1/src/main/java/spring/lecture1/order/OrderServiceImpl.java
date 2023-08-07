@@ -28,4 +28,8 @@ public class OrderServiceImpl implements OrderService {
         return new Order(memberId, itemName, itemPrice, discountPrice);
     }
 
+    //테스트용: memberRepository에 무슨 객체가 들어있는지 반환
+    public MemberRepository getMemberRepository() {
+        return memberRepository;
+    }
 }

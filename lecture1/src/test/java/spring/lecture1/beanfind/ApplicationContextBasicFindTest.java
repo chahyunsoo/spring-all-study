@@ -37,7 +37,7 @@ public class ApplicationContextBasicFindTest {
     @Test
     @DisplayName("구체 타입으로 조회")
     void findBeanBy_Type2() {
-        MemberService memberService = annotationConfigApplicationContext.getBean("memberService",MemberServiceImpl.class);  //하지만 구체 클래스에 의존하는 방식은 좋은 코드는 아님.
+        MemberServiceImpl memberService = annotationConfigApplicationContext.getBean("memberService",MemberServiceImpl.class);  //하지만 구체 클래스에 의존하는 방식은 좋은 코드는 아님.
         assertThat(memberService).isInstanceOf(MemberServiceImpl.class);
     }
 
