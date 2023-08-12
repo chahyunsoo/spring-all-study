@@ -52,4 +52,42 @@ public class Order {
         delivery.setOrder(this);
     }
 
+    //==주문 생성 메소드==//
+    //정적 팩토리 메소드??....
+    public static Order createOrder(Member member, Delivery delivery, OrderItem... orderItems) {  //OrderItem의 createOrder에서 재고를 계산하고 넘어옴
+        Order order = new Order();
+        order.setMember(member);
+        order.setDelivery(delivery);
+        for (OrderItem o : orderItems) {
+            order.addOrderItem(o);
+        }
+        order.setStatus(OrderStatus.ORDER);
+        order.setOrderDate(LocalDateTime.now());
+        return order;
+    }
+
+    //==비즈니스 로직==//
+    //주문 취소
+    public void cancelOrder() {
+        if (delivery.getStatus() == DeliveryStatus.COMP) {
+            throw new IllegalStateException("이미 배송이 시작되었습니다. 상품 수령 후 취소해 주시길 바랍니다");
+        }
+        this.setStatus(OrderStatus.CANCEL);
+        for (OrderItem o : this.orderItems) {
+            o.cancel();
+        }
+    }
+
+    //==조회 로직==//
+    /**
+     * 전체 주문 가격 조회
+     * @return
+     */
+    public int getTotalPrice() {
+        int totalPrice = 0;
+        for (OrderItem orderItem : orderItems) {
+            totalPrice += orderItem.getTotalPrice();
+        }
+        return totalPrice;
+    }
 }

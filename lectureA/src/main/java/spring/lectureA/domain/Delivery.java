@@ -5,8 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Getter
-@Setter
+@Getter @Setter
 public class Delivery {
 
     @Id
@@ -21,6 +20,6 @@ public class Delivery {
     private Address address;
 
     @Enumerated(EnumType.STRING)
-    private DeliveryStatus deliveryStatus; //배송 상태 [READY,COMP]
+    private DeliveryStatus status; //배송 상태 [READY,COMP]
 
 }
