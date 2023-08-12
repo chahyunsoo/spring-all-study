@@ -15,7 +15,7 @@ public class MemberRepository {
 //    @PersistenceContext
 //    @Autowired
 //    EntityManager는 Autowired로 안되고 PersistenceContext로 injection이 된다.
-//    그런데 스프링 부트가 Autowired도 injectino이 가능하게 지원을 해준다.
+//    그런데 스프링 부트가 Autowired도 injection이 가능하게 지원을 해준다.
     private final EntityManager em;
 
 //    public MemberRepository(EntityManager em) {
