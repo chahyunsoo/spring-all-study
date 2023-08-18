@@ -12,4 +12,9 @@ import lombok.Setter;
 public class Movie extends Item{
     private String director;
     private String actor;
+
+    public String getItemType() {
+        return this.getClass().getSimpleName().toLowerCase();
+    }
+
 }
