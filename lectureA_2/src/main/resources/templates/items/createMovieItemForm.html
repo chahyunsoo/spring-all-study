@@ -4,6 +4,7 @@
 
 <body>
 <div class="container">
+<!--  <img th:src="@{/images/son.jpeg}">-->
   <div th:replace="fragments/bodyHeader :: bodyHeader"/>
 
   <form th:action="@{/items/newmovie}" th:object="${movieform}" method="post">

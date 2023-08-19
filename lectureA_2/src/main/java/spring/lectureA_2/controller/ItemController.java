@@ -157,21 +157,28 @@ public class ItemController {
 
 
     @PostMapping("/items/book/{id}/edit")
-    public String updateBookItem(@ModelAttribute("bookform") BookForm form) {
-        Book book = new Book();
-        book.setId(form.getId());
-        book.setName(form.getName());
-        book.setPrice(form.getPrice());
-        book.setStockQuantity(form.getStockQuantity());
-        book.setAuthor(form.getAuthor());
-        book.setIsbn(form.getIsbn());
+    public String updateBookItem(@PathVariable Long itemId, @ModelAttribute("bookform") BookForm form) {  //form은 웹 계층에서만 쓰기로 했으니까, form을 itemService(서비스 계층)으로 넘기는게 번거로움. 그래서 itemService.saveItem(book); 으로 book을 넘겼던 것.
 
-        itemService.saveItem(book);
+//        Book book = new Book();
+//        book.setId(form.getId());
+//        book.setName(form.getName());
+//        book.setPrice(form.getPrice());
+//        book.setStockQuantity(form.getStockQuantity());
+//        book.setAuthor(form.getAuthor());
+//        book.setIsbn(form.getIsbn());
+
+//        itemService.saveItem(book);
+
+        /**
+         * 아래 코드는 어설프게 Entity를 파라미터로 사용하지 않았다. 정확하게 필요한 데이터만 받은 것이다.(name,price,stockQuantity)
+         */
+        itemService.updateItem(itemId, form.getName(), form.getPrice(), form.getStockQuantity());
         return "redirect:/items";
     }
 
     @PostMapping("/items/movie/{id}/edit")
     public String updateMovieItem(@ModelAttribute("movieform") MovieForm form) {
+
         Movie movie = new Movie();
         movie.setId(form.getId());
         movie.setName(form.getName());
@@ -186,6 +193,7 @@ public class ItemController {
 
     @PostMapping("/items/album/{id}/edit")
     public String updateAlbumItem(@ModelAttribute("albumform") AlbumForm form) {
+
         Album album = new Album();
         album.setId(form.getId());
         album.setName(form.getName());

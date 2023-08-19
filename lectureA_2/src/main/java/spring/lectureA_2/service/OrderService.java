@@ -8,6 +8,9 @@ import spring.lectureA_2.domain.item.Item;
 import spring.lectureA_2.repository.ItemRepository;
 import spring.lectureA_2.repository.MemberRepository;
 import spring.lectureA_2.repository.OrderRepository;
+import spring.lectureA_2.repository.OrderSearch;
+
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -53,12 +56,12 @@ public class OrderService {
         order.cancel();
     }
 
-//    /**
-//     * 주문 검색
-//     * */
-//    public List<Order> findOrders(OrderSearch orderSearch) {
-//        return orderRepository.findAll(orderSearch);
-//    }
+    /**
+     * 주문 검색
+     * */
+    public List<Order> findOrders(OrderSearch orderSearch) {
+        return orderRepository.findAllByCriteria(orderSearch);
+    }
 
 }
 

@@ -9,6 +9,7 @@
 <body>
 
 <div class="container">
+<!--    <img th:src="@{/images/son.jpeg}">-->
     <div th:replace="fragments/bodyHeader :: bodyHeader"/>
 
     <form role="form" action="/members/new" th:object="${memberForm}" method="post">
