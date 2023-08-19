@@ -108,6 +108,11 @@ body {
 body {
     padding-top: 20px;
     padding-bottom: 20px;
+
+    /*background-image: url('/images/spursbackground.jpeg'); /* 배경 이미지 설정 */
+    /*background-size: cover; /* 이미지가 컨테이너 크기에 맞게 조절됨 */
+    /*background-position: center center; /* 이미지가 중앙에 위치하도록 설정 */
+    /*background-repeat: no-repeat; /* 이미지가 반복되지 않도록 설정 */
 }
 
 .header,
@@ -136,6 +141,7 @@ body {
 
 .container {
     max-width: 730px;
+    /* 새로 추가할 속성들 */
 }
 
 .jumbotron {
