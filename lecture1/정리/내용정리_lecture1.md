@@ -622,6 +622,133 @@ memberRepository = spring.lecture1.member.MemoryMemberRepository@25aca718
 즉, 실행결과에서 볼 수 있듯이, @Configuration 어노테이션이 없어지면 CGLIB 바이트 조작 라이브러리를 사용하지 않아
 싱글톤임을 보장할 수 없다.
 
+---
+
+### 컴포넌트 스캔과 의존관계 자동 주입
+
+#### 컴포넌트 스캔
+
+- 컴포넌트 스캔을 사용하려면 우선 @ComponentScan을 붙혀주면 된다.
+- 컴포넌트 스캔은 글자 그대로 <b>@Component가 붙은 클래스들을 쫙 스캔해서 스프링 빈으로 등록</b>한다.
+
+기존에는 AppConfig(직접 수동으로 빈 등록)으로 주입을 명시적으로 나타낼 수 있었다.
+하지만 컴포넌트 스캔을 사용하면 AutoAppConfig 안에는 아무것도 없고, 떡하니 MemberServiceImpl이 빈으로 등록이 된다.
+그러면 의존관계 주입을 어떻게 해주냐? -> 그래서 자동 의존관계 주입이 필요하다. @Autowired를 생성자에 붙혀주면,
+아래 코드처럼 MemberRepository타입에 맞는 것을 찾아와서 의존관계를 자동(Auto)으로 주입(wired) 해준다.
+
+```java
+@Component
+public class MemberServiceImpl implements MemberService {
+    
+  public MemberServiceImpl(MemberRepository memberRepository) {
+    this.memberRepository = memberRepository;
+  }
+  ...
+}
+
+@Configuration
+@ComponentScan(
+        excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Configuration.class))
+public class AutoAppConfig {
+
+}
+```
+
+Component Scanning: @Component, @Service, @Repository 등의 어노테이션이 붙은 클래스를 스프링이 자동으로 빈으로 등록할 때, 
+기본적으로 클래스 이름의 첫 글자를 소문자로 변경한 이름이 빈의 이름으로 사용됨.
+그래서 이제는,
+```java
+MemberService memberService = annotationConfigApplicationContext.getBean("memberServiceImpl", MemberService.class); // O
+MemberService memberService = annotationConfigApplicationContext.getBean("memberService", MemberService.class);  // X
+```
+
+#### 탐색 위치와 기본 스캔 대상
+
+```java
+@ComponentScan(
+        basePackages = "spring.lecture1.member", //member패키지안에 있는 것들만 컴포넌트 스캔이 된다.
+        basePackagesClasses = AutoAppConfig.class,  //AutoAppConfig클래스가 위치한 패키지부터 찾는다.  
+        excludeFilters= @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Configuration.class))
+public class AutoAppConfig {
+
+}
+```
+
+위의 basePackages,basePackagesClasses를 붙이지 않으면 AutoAppConfig가 위치하고 있는 패키지부터 탐색을 한다.
+많이 사용하는 방법은 패키지 위치를 지정하지 않고, 설정 정보 클래스의 위치를 프로젝트 최상 단에 두는 것이다.
+프로젝트 메인 설정 정보는 프로젝트를 대표하는 정보이기 때문에 프로젝트 시작 루트 위치에 두는 것이 좋다.
+스프링 부트를 사용하면 스프링 부트의 대표 시작 정보인 @SpringBootApplication를 프로젝트 시작 루트 위치에 두는 것이 관례이다. 
+(그리고 이 설정안에 바로 @ComponentScan 이 들어있다!) 
+그래서 스프링 부트를 쓰면, 내 프로젝트 시작 루트 위치부터 컴포넌트 스캔을 하겠다는 것이다. 
+
+#### 필터
+
+- includeFilters: 컴포넌트 스캔 대상을 추가로 지정한다.
+- excludeFilters: 컴포넌트 스캔에서 제외할 대상을 지정한다.
+
+```java
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface MyIncludeComponent { //MyIncludeComponent이 붙은 것은 컴포넌트 스캔에 추가할 것이다.
+}
+
+@MyIncludeComponent
+public class IncludeBean {
+}
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface MyExcludeComponent { //MyExcludeComponent이 붙은 것은 컴포넌트 스캔에 제외할 것이다.
+}
+
+@MyExcludeComponent
+public class ExcludeBean {
+}
+
+...
+        
+AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(TestConfig.class);
+IncludeBean includeBean = annotationConfigApplicationContext.getBean("includeBean", IncludeBean.class);
+ExcludeBean excludeBean = annotationConfigApplicationContext.getBean("excludeBean", ExcludeBean.class); //스프링 빈에 등록안되서 예외 발생!
+
+@Configuration
+@ComponentScan(
+        includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = MyIncludeComponent.class),
+        excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = MyExcludeComponent.class)
+)
+static class TestConfig { }
+```
+
+- FilterType.ANNOTATION : 기본값, 어노테이션을 인식해서 동작하는 역할을 한다.
+- includeFilters에 'MyIncludeComponent' 어노테이션을 추가해서 IncludeBean클래스가 'includeBean'으로 스프링 빈에 등록된다.
+- excludeFilters에 'MyExcludeComponent' 어노테이션을 추가해서 ExcludeBean클래스가 스프링 빈에 등록되지 않는다.
+
+만약 내가 등록한 includeBean 빈도 등록되지 않게 하려면,
+```java
+@Configuration
+@ComponentScan(
+        includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = MyIncludeComponent.class),
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = MyExcludeComponent.class),
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = IncludeBean.class)
+        }
+)
+```
+
+#### 중복 등록과 충돌
+
+1) 자동 빈 등록과 자동 빈 등록의 충돌 -> ConflictingBeanDefinitionException 예외 발생
+2) 수동 빈 등록과 자동 빈 등록의 충돌 -> 수동 빈 등록이 자동 빈 등록보다 우선이 되는게 좋지만, 항상 이렇게 이상적으로 될 수는 없다. 그래서 최근 스프링 부트는 이런 경우 오류가 발생하도록 기본 값을 바꾸어 세팅하였다.
+```java
+Consider renaming one of the beans or enabling overriding by setting
+spring.main.allow-bean-definition-overriding=true
+```
+
+
+
+
 
 
 

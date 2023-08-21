@@ -1,10 +1,15 @@
 package spring.lecture1.member;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
 public class MemberServiceImpl implements MemberService {
 //    private final MemberRepository memberRepository = new MemoryMemberRepository();
 //    DIP지키기 위해서 인터페이스에만 의존하게 변경(->AppConfig)
     private final MemberRepository memberRepository;
 
+    @Autowired
     public MemberServiceImpl(MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
