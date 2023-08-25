@@ -1,4 +1,4 @@
-plugins {
+ plugins {
 	id 'java'
 	id 'war'
 	id 'org.springframework.boot' version '3.1.3'

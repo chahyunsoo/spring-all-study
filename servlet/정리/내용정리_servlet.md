@@ -96,6 +96,149 @@ WAS의 주요한 튜닝 포인트는 '최대 쓰레 수' 이다.
     - SSR을 사용하더라도, 자바스크립트를 사용해서 화면 일부를 동적으로 변경 가능
 
 
+### HTTP 요청 데이터 
+HTTP 요청 메시지를 통해서 클라이언트에서 서버로 데이터를 전달하는 방법
+ 
+- GET - 쿼리 파라미터
+  - /url?username=hello&age=20
+  - 메시지 바디 없이, URL의 쿼리 파라미터에 데이터를 포함해서 전달 예) 검색, 필터, 페이징등에서 많이 사용하는 방식
+- POST - HTML Form
+  - content-type(Body에 대한 정보에 대해 설명, 어떤 스타일의 데이터인지..): application/x-www-form-urlencoded
+  - 메시지 바디에 쿼리 파리미터 형식으로 전달 username=hello&age=20 예) 회원 가입, 상품 주문, HTML Form 사용
+- HTTP message body에 데이터를 직접 담아서 요청 HTTP API에서 주로 사용, JSON, XML, TEXT
+  - 데이터 형식은 주로 JSON 사용 POST, PUT, PATCH
+
+#### GET 쿼리 파라미터 
+
+[복수 파라미터에서 단일 파라미터 조회]
+
+```java
+        System.out.println("[전체 파라미터 조회] - start");
+        request.getParameterNames().asIterator()
+                        .forEachRemaining(paramName -> System.out.println(paramName + "=" + request.getParameter(paramName)));
+        System.out.println("[전체 파라미터 조회] - end");
+        
+        System.out.println("[단일 파라미터 조회]");
+        String username = request.getParameter("username");
+        String age = request.getParameter("age");
+        
+        System.out.println("[이름이 같은 복수 파라미터 조회]");
+        String[] usernames = request.getParameterValues("username");
+        for (String duplicateName : usernames) {
+            System.out.println("username = " + duplicateName);
+        }
+```
+<br>username=hello&username=cha 와 같이 파라미터 이름은 하나 인데, 값이 중복 이면 어떻게 될까?
+<br>request.getParameter() 는 하나의 파라미터 이름에 대해서 단 하나의 값만 있을 때 사용 해야 한다.
+<br>지금처럼 중복일 때는 request.getParameterValues() 를 사용 해야 한다는 소리이다.
+<br>참고로 이렇게 중복일 때 request.getParameter() 를 사용 하면 request.getParameterValues() 의 첫 번째 값을 반환 한다.
+<br>하지만 이렇게 중복으로 보내는 경우는 별로 없는 것 같다.
+
+#### POST HTML Form
+HTML의 Form을 사용해서 클라이언트에서 서버로 데이터를 전송하는 방법
+<br>회원 가입이나, 상품 주문 폼에서 주로 사용
+
+메시지 Body에 데이터가 들어가기 때문에 content-type이 있다.
+- content-type: application/x-www-form-urlencoded
+- 메시지 Body에 쿼리 파리미터 형식으로 데이터를 전달한다. username=hello&age=20
+
+POST의 HTML Form을 전송하면 웹 브라우저는 다음 형식으로 HTTP 메시지를 만든다.(웹의 개발자 도구를 보면)
+- 요청 URL: http://localhost:8080/request-param
+- content-type: application/x-www-form-urlencoded 
+- message body: username=hello&age=20
+
+content-type은 HTTP 메시지 Bodys의 데이터 형식을 지정한다.
+
+> GET URL 쿼리 파라미터 형식으로 클라이언트에서 서버로 데이터를 전달할 때는 HTTP 메시지 Body를 사용하지 않기 때문에 content-type이 없다.
+
+> POST HTML Form 형식으로 데이터를 전달하면 **HTTP 메시지 Body에 해당 데이터를 포함해서 보내**기 때문에
+Body에 포함된 데이터가 어떤 형식인지 content-type을 꼭 지정해야 한다. 
+이렇게 폼으로 데이터를 전송하는 형식을 application/x-www-form-urlencoded 라 한다.
+
+
+#### API 메시지 Body - 단순 텍스트
+
+- HTTP message body에 데이터를 직접 담아서 요청
+- HTTP API에서 주로 사용, JSON, XML, TEXT 
+- 데이터 형식은 주로 JSON 사용
+- POST, PUT, PATCH
+
+HTTP 메시지 바디의 데이터를 InputStream를 통해서 직접 읽을 수 있다.
+```java
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        //메시지 Body의 내용을 바이트 코드로 바로 얻을 수 있다.
+        ServletInputStream inputStream = request.getInputStream();
+        String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+        System.out.println("messageBody = " + messageBody);
+
+        response.getWriter().write("ok");
+    }
+```
+
+- inputStream은 byte 코드를 반환한다. byte 코드를 우리가 읽을 수 있는 문자(String)로 보려면 문자표(Charset)를 지정해주어야 한다. 
+여기서는 UTF_8 Charset을 지정해주었다.
+
+- 문자 전송
+  - POST http://localhost:8080/request-body-string 
+  - content-type: text/plain
+  - message body: hello
+  - 결과: messageBody = hello
+
+
+#### API 메시지 Body - JSON
+
+- JSON 형식 전송
+  - POST http://localhost:8080/request-body-json 
+  - content-type: application/json
+  - message body: {"username": "hello", "age": 20} 
+  - 결과: messageBody = {"username": "hello", "age": 20}
+
+보통 JSON을 그대로 사용하지 않기 때문에, JSON형식을 파싱할 수 있도록 
+일단 객체를 만들었다.
+```java
+@Getter
+@Setter
+public class HelloData {
+
+    private String username;
+    private int age;
+
+}
+```
+그리고 JSON을 전달받아 객체로 변환하는 과정을 거쳐야 한다.
+```java
+@WebServlet(name = "requestBodyJsonServlet",urlPatterns ="/request-body-json")
+public class RequestBodyJsonServlet extends HttpServlet {
+    private ObjectMapper objectMapper = new ObjectMapper();
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+      //메시지 Body의 내용을 바이트 코드로 바로 얻을 수 있다.
+      ServletInputStream inputStream = request.getInputStream();
+      String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+
+      HelloData helloData = objectMapper.readValue(messageBody, HelloData.class);
+      System.out.println("helloData.getUsername()= " + helloData.getUsername());
+      System.out.println("helloData.getAge() = " + helloData.getAge());
+    }
+[실행 결과]
+messageBody = {
+    "username":"name",
+    "age":20
+}
+helloData.getUsername()= name
+helloData.getAge() = 20
+```
+JSON 결과를 파싱해서 사용할 수 있는 자바 객체로 변환하려면 Jackson, Gson 같은 JSON 변환 라이브러리를 추가해서 사용해야 한다. 
+스프링 부트로 Spring MVC를 선택하면 기본으로 Jackson 라이브러리( ObjectMapper )를 함께 제공한다.
+
+
+
+
+
+
+
+
 
 
 
