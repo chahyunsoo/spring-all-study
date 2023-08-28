@@ -12,7 +12,7 @@ public class JpaMemberRepository implements MemberRepository{
     /*
     * implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     * 이 라이브러리를 주입받았으니까 스프링 부트가 EntityManger라는 것을 생성을 해준다(현재 데이터베이스랑 연결을 다 해줌)
-    * 그래서 만들어준 것을 injectino만 받으면 된다.
+    * 그래서 만들어준 것을 injection만 받으면 된다.
     * application.properties에서 설정했던 정보들이랑 데이터베이스 Connection정보들이랑 자동으로 합쳐서 스프링 부트가 EntityManager를 만들어준 것.
     * 이것은 내부적으로, 이전에 만들었던 Datasource나 이런 것들을 내부적으로 들고 있어서, DB랑 통신하는 것을 내부에서 다 처리를 한다.
     * 결론은 JPA를 쓸려면 EntityManager를 주입을 받아야 한다.

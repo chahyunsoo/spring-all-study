@@ -41,7 +41,7 @@ public class jpaMain {
 
             //Member 객체를 대상으로 쿼리를 짠다.
             List<Member> result = entityManager.createQuery("select m from Member as m", Member.class)
-                     .setFirstResult(1)  //1번 부터
+                    .setFirstResult(1)  //1번 부터
                     .setMaxResults(10)  //10개 가져와라.
                     .getResultList();
 
