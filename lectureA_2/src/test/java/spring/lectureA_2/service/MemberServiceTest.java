@@ -12,10 +12,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @Transactional
 public class MemberServiceTest {
-    @Autowired
-    MemberService memberService;
-    @Autowired
-    MemberRepository memberRepository;
+    @Autowired MemberService memberService;
+    @Autowired MemberRepository memberRepository;
     @Test
     public void 회원가입() throws Exception {
         //given

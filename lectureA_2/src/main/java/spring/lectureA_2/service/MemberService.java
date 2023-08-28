@@ -11,8 +11,9 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 public class MemberService {
-    @Autowired
-    MemberRepository memberRepository;
+    @Autowired MemberRepository memberRepository;
+
+
     /**
      * 회원가입
      */
