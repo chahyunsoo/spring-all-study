@@ -160,19 +160,57 @@ defaultValue의 값이 -1로 설정했기 때문에, null로 값이 들어올리
 
 마지막으로 파라미터를 Map으로 조회할 수 있다.
 
-
-
-
-
 #### ModelAttribute
 
+```java@ResponseBody
+@RequestMapping("/model-attribute-v1")
+public String modelAttribute_V1(@RequestParam String username,@RequestParam int age) {
+    HelloData helloData = new HelloData();
+    helloData.setUsername(username);
+    helloData.setAge(age);
+
+    log.info("username={},age={}", helloData.getUsername(), helloData.getAge());
+    log.info("helloData={}", helloData);
+    return "ok";
+}
+```
+위의 코드를 @ModelAttribute 어노테이션을 이용하여 바꿀 수 있다. (HelloData객체는 username과 age필드만 가지고 있는 DTO라고 가정)
+
+```java
+@RequestParam String username;
+@RequestParam int age;
+
+HelloData data = new HelloData();
+data.setUsername(username);
+data.setAge(age);
+```
+스프링인 위의 코드를 @ModelAttribute 로 대체 해준다.
+
+```java
+@ResponseBody
+@RequestMapping("/model-attribute-v1")
+public String modelAttribute_V2(@ModelAttribute HelloData helloData) {
+    log.info("username={},age={}", helloData.getUsername(), helloData.getAge());
+    log.info("helloData={}", helloData);
+    return "ok";
+}
+```
+
+우선 @ModelAttribute는 이 순서대로 동작한다.(위의 코드를 예시로)
+- HelloData 객체를 생성한다.
+- 요청 파라미터 이름으로 HelloData 객체의 프로퍼티(setXxx,getXxx)를 찾는다. ?username=my 이면 setUsername()을 찾고
+  파라미터의 값을 입력한다.
 
 
+이 @ModelAttribute 어노테이션을 생략해도 된다. 하지만 좀 전에 @RequestParam도 생략가능하다고 했는데,
+조금 헷갈리긴 한 것 같다.
+그래서 스프링은 int,String,Integer 들과 같은 단순 타입은 => @RequestParam을 지원하고,
+그 외의 타입은 @ModelAttribute를 지원하지만, argument resolver 타입으로 지정(ex. HttpServletRequest)한 것은 제외한다.
 
 
+### 요청 Message
 
-
-
+#### 단순 text
 
 
 

@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import spring_mvc.springmvc.basic.HelloData;
 
 import java.io.IOException;
 import java.util.Map;
@@ -16,26 +17,28 @@ public class RequestParamController {
     /**
      * [V1]
      * 반환 타입이 void인 상태에서 response에 직접 값을 넣었다.
+     *
      * @param request
      * @param response
      * @throws IOException
      */
-    @RequestMapping(value = "/request-param-v1",method = RequestMethod.GET)
+    @RequestMapping(value = "/request-param-v1", method = RequestMethod.GET)
     public void requestParamV1(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String username = request.getParameter("username");
         int age = Integer.parseInt(request.getParameter("age"));
 
-        log.info("username={},age={}",username,age);
+        log.info("username={},age={}", username, age);
 
         response.getWriter().write("ok");
     }
 
     /**
      * [V2]
-     * @ResponseBody를 추가한 버전, @ResponseBody  는 HTTP 응답 메세지에 return값을 바로 넣어서 반환한다,.
+     *
      * @param myName
      * @param myAge
      * @return
+     * @ResponseBody를 추가한 버전, @ResponseBody  는 HTTP 응답 메세지에 return값을 바로 넣어서 반환한다,.
      */
     @ResponseBody //이걸 붙히면 ok라는 문자가 HTTP 응답 메시지에 바로 딱 넣어서 반환한다. @RestController와 같은 역할
     @RequestMapping("/request-param-v2")
@@ -50,6 +53,7 @@ public class RequestParamController {
     /**
      * [V3]
      * url을 작성할때 HTTP 파라미터 이름이 @RequestParam의 변수 이름과 같으면 생략 가능하다.
+     *
      * @param username
      * @param age
      * @return
@@ -66,6 +70,7 @@ public class RequestParamController {
     /**
      * [V4]
      * String, int, Integer등 단순 타입이면 @RequestParam 어노테이션 자체를 생략할 수 있다.
+     *
      * @param username
      * @param age
      * @return
@@ -78,10 +83,10 @@ public class RequestParamController {
     }
 
     /**
-     * @RequestParam(required=true)가 기본 값, @RequestParam(required=false)로 하면 값을 꼭 입력할 필요는 없다.
      * @param username
      * @param age
      * @return
+     * @RequestParam(required=true)가 기본 값, @RequestParam(required=false)로 하면 값을 꼭 입력할 필요는 없다.
      */
     @ResponseBody
     @RequestMapping("/request-param-required")
@@ -92,14 +97,15 @@ public class RequestParamController {
 
     /**
      * 추가로 @RequestParam(defaultValue="....") 를 넣으면, 파라미터 값이 없으면 그 값으로 defaultValue의 값이 들어온다.
+     *
      * @param username
      * @param age
      * @return
      */
     @ResponseBody
     @RequestMapping("/request-param-default")
-    public String requestParamDefault (@RequestParam(required = true,defaultValue = "guest") String username,
-                                       @RequestParam(required = false,defaultValue = "-1") int age) {
+    public String requestParamDefault(@RequestParam(required = true, defaultValue = "guest") String username,
+                                      @RequestParam(required = false, defaultValue = "-1") int age) {
         //username 값이 없으면 guest가 값이 된다는 뜻.
         log.info("username={},age={}", username, age);
         return "ok";
@@ -107,6 +113,7 @@ public class RequestParamController {
 
     /**
      * 파라미터를 Map으로 조회
+     *
      * @param paramMap
      * @return
      */
@@ -117,5 +124,41 @@ public class RequestParamController {
         return "ok";
     }
 
+    @ResponseBody
+    @RequestMapping("/model-attribute-v1")
+    public String modelAttribute_V1(@RequestParam String username,@RequestParam int age) {
+        HelloData helloData = new HelloData();
+        helloData.setUsername(username);
+        helloData.setAge(age);
 
+        log.info("username={},age={}", helloData.getUsername(), helloData.getAge());
+        log.info("helloData={}", helloData);
+        return "ok";
+    }
+
+    /**
+     * @ModelAttribute로 변경
+     * @param helloData
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/model-attribute-v2")
+    public String modelAttribute_V2(@ModelAttribute HelloData helloData) {
+        log.info("username={},age={}", helloData.getUsername(), helloData.getAge());
+        log.info("helloData={}", helloData);
+        return "ok";
+    }
+
+    /**
+     * @ModelAttribute 를 생략해도 위의 코드와 동일하게 동작한다.
+     * @param helloData
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/model-attribute-v3")
+    public String modelAttribute_V3(HelloData helloData) {
+        log.info("username={},age={}", helloData.getUsername(), helloData.getAge());
+        log.info("helloData={}", helloData);
+        return "ok";
+    }
 }
