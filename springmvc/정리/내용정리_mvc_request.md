@@ -87,8 +87,7 @@ log에 username=hello , age=20 결과가 찍힌다. 이미 앞에서 servlet 공
 #### @RequestParam
 
 - @RequestParam은 파라미터 이름으로 바인딩을 한다.
-- @ResponseBody를 사용하면 반환값이 뷰 리졸버를 거쳐서 뷰를 찾는 것이 아니라, HTTP 메시지 Body에 
-직접 값을 집어넣는다.
+- @ResponseBody를 사용하면 반환값이 뷰 리졸버를 거쳐서 뷰를 찾는 것이 아니라, HTTP 메시지 Body에 직접 값을 집어넣는다.
 
 ```java
 @ResponseBody //이걸 붙히면 ok라는 문자가 HTTP 응답 메시지에 바로 딱 넣어서 반환한다. @RestController와 같은 역할
@@ -212,14 +211,123 @@ public String modelAttribute_V2(@ModelAttribute HelloData helloData) {
 
 #### 단순 text
 
+앞에서 봤던 요청 파라미터의 내용(GET-쿼리 파라미터, POST-Form)들과는 다르게, Http Message Body에 직접 데이터가 담겨서
+넘어오는 경우에는 @RequestParam, @ModelAttribute를 사용할 수 없다. 
 
+```java
+@PostMapping("/request-body-string-v1")
+    public void requestBodyStringV1(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        ServletInputStream inputStream = request.getInputStream();
+        String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
 
+        log.info("messagebody={}", messageBody);
+        response.getWriter().write("ok");
+}
 
+@PostMapping("/request-body-string-v2")
+public void requestBodyStringV2(InputStream inputStream, Writer responseWriter) throws IOException {
+    String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
 
+    log.info("messagebody={}", messageBody);
+    responseWriter.write("ok");
+}
+```
+- InputStream(Reader): HTTP 요청 메시지 바디의 내용을 직접 조회 
+- OutputStream(Writer): HTTP 응답 메시지의 바디에 직접 결과 출력
 
+POST요청으로 localhost:8080/request-body-string-v1(또는 v2) 를 요청하고 요청 메시지에 text타입으로 문자열을 입력하면
+message = 문자열이 찍히게 된다. 하지만 위의 코드를 보면 현재 나는 servlet에 대한 코드가 필요가 없다. HttpServletRequest가 통으로 필요한 것이 아니기 때문에,
+InputStream으로 바꿔서 사용할 수 있다.
+아래 코드는 InputStream인자를 이용하여 바로 메시지를 Body내용을 조회한 것이다.
 
+하지만 여전히 뭔가 불편한 감이 있는 것 같다. 뭔가 막 stream을 바꾸고(ex.String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);)
+이런 과정들이 복잡한 것 같다.(그렇다고 치자.)
 
+이 모든 복잡한 과정들을 HttpEntity의 이용과 Http message converter가 동작을 함으로써 해결할 수 있다.
+```java
+@PostMapping("/request-body-string-v3")
+public HttpEntity<String> requestBodyStringV3(HttpEntity<String> httpEntity) throws IOException {
+    String messagebody = httpEntity.getBody(); //Http 메시지에 있는 Body를 꺼낸다. 변환된 Body를 꺼낼 수 있다.
+    log.info("messagebody={}", messagebody);
+    return new HttpEntity<>("ok");
+}
+```
+코드가 확연히 줄었다. 이 코드는 이렇게 해석할 수 있다.
+메소드의 인자로 HttpEntity<String>을 넣어줌으로 인하여 스프링이 알아서 <String> 이니까 내가 Http Body에 있는 것을 문자로 바꿔서 넣어준다.
+그래서 `String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);` 
+이 코드가 생략되며 스프링이 이 코드를 대신 실행해주면서 Http message converter가 동작을 한다.
+그리고 Http 메시지에 있는 Body를 꺼내고 메소드의 반환타입을 HttpEntity<String>으로 지정하면서,
+기존의 코드와 동일하게 반환할 수 있다. 그래서 마치 Http 메시지를 그대로 주고 받는 형식으로 만들 수 있다.
+
+- HttpEntity 정리
+  - HttpEntity: HTTP header, body 정보를 편리하게 조회
+    - 메시지 바디 정보를 직접 조회
+    - 요청 파라미터를 조회하는 기능과 관계 없음 @RequestParam X, @ModelAttribute X 
+    
+  - HttpEntity는 응답에도 사용 가능
+    - 메시지 바디 정보 직접 반환 
+    - 헤더 정보 포함 가능
+    - view 조회X
+    - HttpEntity 를 상속받은 다음 객체들도 같은 기능을 제공한다. 
   
+- RequestEntity
+  - HttpMethod, url 정보가 추가, 요청에서 사용 
+  
+- ResponseEntity
+  - HTTP 상태 코드 설정 가능, 응답에서 사용
+  - return new ResponseEntity<String>("Hello World", responseHeaders,
+    HttpStatus.CREATED
+
+```java
+@PostMapping("/request-body-string-v4")
+public ResponseEntity<String> requestBodyStringV4(RequestEntity<String> httpEntity) throws IOException {
+    String messagebody = httpEntity.getBody();
+    HttpHeaders headers = httpEntity.getHeaders();
+
+    log.info("messagebody={}", messagebody);
+    log.info("headers={}", headers);
+    return new ResponseEntity<>("ok", HttpStatus.OK);
+}
+```
+
+그런데 여기서 또 드는 생각이 HttpEntity를 써야돼?라는 생각이 들 수 있다.(그렇다고 치자.)
+그래서 스프링은 @RequestBody 어노테이션을 지원한다.
+
+```java
+@ResponseBody
+@RequestMapping("/model-attribute-v3")
+public String modelAttribute_V3(HelloData helloData) {
+    log.info("username={},age={}", helloData.getUsername(), helloData.getAge());
+    log.info("helloData={}", helloData);
+    return "ok";
+}
+```
+
+그래서 @RequestBody를 인자로 사용하면 Http message Body의 내용을 편리하게 읽을 수 있다.
+
+- @RequestBody
+  - 메시지 바디 정보를 직접 조회(@RequestParam X, @ModelAttribute X)
+  - HttpMessageConverter 사용 -> StringHttpMessageConverter 적용 
+- @ResponseBody
+  - 메시지 바디 정보 직접 반환(view 조회X)
+  - HttpMessageConverter 사용 -> StringHttpMessageConverter 적용
+
+- 참고로 헤더 정보가 필요하다면 HttpEntity 를 사용하거나 @RequestHeader 를 사용하면 된다. 
+이렇게 메시지 Body를 직접 조회하는 기능은 요청 파라미터를 조회하는 @RequestParam , @ModelAttribute 와는 전혀 관계가 없다.
+
+> 그래서 결론은 요청 파라미터를 조회하는 것은 `@RequestParam` `@ModelAttribute` 를 사용하면 되고, Http 메시지 Body를 바로 읽을 때는 `@ResponseBody`를 바로 사용하면 된다.
+@ResponseBody는 응답 결과를 Http 메시지 Body에 직접 담아서 반환할 수 있기 때문이다. 
+
+
+ 
+
+
+
+
+
+
+
+
 
 
 
