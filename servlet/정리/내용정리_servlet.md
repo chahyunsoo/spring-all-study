@@ -147,7 +147,7 @@ POST의 HTML Form을 전송하면 웹 브라우저는 다음 형식으로 HTTP �
 - content-type: application/x-www-form-urlencoded 
 - message body: username=hello&age=20
 
-content-type은 HTTP 메시지 Bodys의 데이터 형식을 지정한다.
+content-type은 HTTP 메시지 Body의 데이터 형식을 지정한다.
 
 > GET URL 쿼리 파라미터 형식으로 클라이언트에서 서버로 데이터를 전달할 때는 HTTP 메시지 Body를 사용하지 않기 때문에 content-type이 없다.
 

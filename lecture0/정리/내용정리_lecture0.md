@@ -30,10 +30,10 @@
 1번은 @RequestParam을 사용하여 나타낸다
 ```java
 @GetMapping("lecture-number")
-    public String lectureZero(@RequestParam("step") int id, Model model) {
-        model.addAttribute("step", id);
-        return "lecture-number";
-    }
+public String lectureZero(@RequestParam("step") int id, Model model) {
+    model.addAttribute("step", id);
+    return "lecture-number";
+}
 ```
 이 코드를 보면, http://localhost:8080/lecture-number?step=1 형태로 전달을 해야한다.
 URL이 전달될 때, step 파라미터(step에 담긴 value)를 받아오게 된다
@@ -93,10 +93,10 @@ View를 찾아서 템플릿 엔진을 통해서 화면을 랜더링 해서 HTML�
 
 ```java
 @GetMapping("lecture-date")
-    @ResponseBody
-    public String lectureDate(@RequestParam(value = "practicedDate", required = false) String date) {
-        return "강의 수강 Month: " + date;  
-    }
+@ResponseBody
+public String lectureDate(@RequestParam(value = "practicedDate", required = false) String date) {
+    return "강의 수강 Month: " + date;   
+}
 ```
 "@ResponseBody 원리"
 
