@@ -275,9 +275,8 @@ public HttpEntity<String> requestBodyStringV3(HttpEntity<String> httpEntity) thr
   - HttpMethod, url 정보가 추가, 요청에서 사용 
   
 - ResponseEntity
-  - HTTP 상태 코드 설정 가능, 응답에서 사용
-  - return new ResponseEntity<String>("Hello World", responseHeaders,
-    HttpStatus.CREATED
+  - HTTP 상태 코드를 넣을 수 있다, 응답에서 사용
+  - return new ResponseEntity<String>("Hello World", responseHeaders, HttpStatus.CREATED)
 
 ```java
 @PostMapping("/request-body-string-v4")
@@ -374,6 +373,13 @@ json이 객체가 되었다가, 객체가 반환될 때 다시 json이 되서 �
 잠깐 헷갈리는 부분이 있어서 @RequestBody를 사용할 때와 HttpEntity를 사용할 때의 차이점을 다시 정리해보았다.
 @RequestBody는 HTTP 요청 본문의 내용만 객체로 변환하여 처리하는 데 사용된다.
 HttpEntity는 HTTP 요청의 본문과 헤더 모두에 액세스하려는 경우에 사용된다.
+
+- @RestController => @Controller + @ResponseBody
+View 템플릿을 사용하는 것이 아니라, HTTP 메시지 Body에 직접 데이터를 입력한다. 
+@RestController 글자 대로 **Rest API(HTTP API)를 만들 때 사용하는 컨트롤러**이다.
+참고로 @ResponseBody 는 클래스 레벨에 추가하면 전체 메서드에 적용된다. 
+
+
 
 
 
