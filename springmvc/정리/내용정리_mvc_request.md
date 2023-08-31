@@ -161,9 +161,10 @@ defaultValue의 값이 -1로 설정했기 때문에, null로 값이 들어올리
 
 #### ModelAttribute
 
-```java@ResponseBody
+```java
+@ResponseBody
 @RequestMapping("/model-attribute-v1")
-public String modelAttribute_V1(@RequestParam String username,@RequestParam int age) {
+public String modelAttribute_V1(@RequestParam String username, @RequestParam int age) {
     HelloData helloData = new HelloData();
     helloData.setUsername(username);
     helloData.setAge(age);
@@ -238,10 +239,10 @@ public void requestBodyStringV2(InputStream inputStream, Writer responseWriter) 
 POST요청으로 localhost:8080/request-body-string-v1(또는 v2) 를 요청하고 요청 메시지에 text타입으로 문자열을 입력하면
 message = 문자열이 찍히게 된다. 하지만 위의 코드를 보면 현재 나는 servlet에 대한 코드가 필요가 없다. HttpServletRequest가 통으로 필요한 것이 아니기 때문에,
 InputStream으로 바꿔서 사용할 수 있다.
-아래 코드는 InputStream인자를 이용하여 바로 메시지를 Body내용을 조회한 것이다.
+위의 코드는 InputStream인자를 이용하여 바로 메시지를 Body내용을 조회한 것이다.
 
 하지만 여전히 뭔가 불편한 감이 있는 것 같다. 뭔가 막 stream을 바꾸고(ex.String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);)
-이런 과정들이 복잡한 것 같다.(그렇다고 치자.)
+이런 과정들이 복잡한 것 같다.
 
 이 모든 복잡한 과정들을 HttpEntity의 이용과 Http message converter가 동작을 함으로써 해결할 수 있다.
 ```java
@@ -253,7 +254,7 @@ public HttpEntity<String> requestBodyStringV3(HttpEntity<String> httpEntity) thr
 }
 ```
 코드가 확연히 줄었다. 이 코드는 이렇게 해석할 수 있다.
-메소드의 인자로 HttpEntity<String>을 넣어줌으로 인하여 스프링이 알아서 <String> 이니까 내가 Http Body에 있는 것을 문자로 바꿔서 넣어준다.
+메소드의 인자로 HttpEntity<String>을 넣어줌으로 인하여 스프링이 알아서 <String> 이니까 Http Body에 있는 것을 문자로 바꿔서 넣어준다.
 그래서 `String messageBody = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);` 
 이 코드가 생략되며 스프링이 이 코드를 대신 실행해주면서 Http message converter가 동작을 한다.
 그리고 Http 메시지에 있는 Body를 꺼내고 메소드의 반환타입을 HttpEntity<String>으로 지정하면서,
@@ -295,10 +296,9 @@ public ResponseEntity<String> requestBodyStringV4(RequestEntity<String> httpEnti
 
 ```java
 @ResponseBody
-@RequestMapping("/model-attribute-v3")
-public String modelAttribute_V3(HelloData helloData) {
-    log.info("username={},age={}", helloData.getUsername(), helloData.getAge());
-    log.info("helloData={}", helloData);
+@PostMapping("/request-body-string-v5")
+public String requestBodyStringV5(@RequestBody String messagebody) throws IOException {
+    log.info("messagebody={}", messagebody);
     return "ok";
 }
 ```
@@ -319,18 +319,61 @@ public String modelAttribute_V3(HelloData helloData) {
 @ResponseBody는 응답 결과를 Http 메시지 Body에 직접 담아서 반환할 수 있기 때문이다. 
 
 
- 
+#### JSON
 
+```java
+@ResponseBody
+@PostMapping("/request-body-json-v3")
+public String requestBodyJsonV3(@RequestBody HelloData helloData) {
+    log.info("username={},age={}", helloData.getUsername(), helloData.getAge());
+    return "good";
+}
+```
 
+@RequestBody에 String 뿐만이 아니라 HelloData 처럼 객체를 넣을 수 있다.
 
+현재 Http 메시지 Body에 {"username":"hello", "age":20} , content-type: application/json 이 정보가 넘어온다고 가정하자.
+그러면 Http message converter가 넘어오는 정보의 content-type이 json이기 때문에 객체에 맞는 것으로 반환해주는데,
+MappingJacksonHttpMessageConverter가 동작을 해서 이것이 `objectMapper.readValue(messageBody, HelloData.class);` 이 코드를 
+대신 실행해준다. 즉 Http message converter 가 앞서 content-type이 json이었기 때문에  `objectMapper.readValue(messageBody, HelloData.class);` 이 코드를 대신 실행시킨다는 것이다.
 
+추가로 @RequestBody는 생략이 불가능하다.
+위에서 이런 내용이 있었다. String , int , Integer 같은 단순 타입은 @RequestParam을 적용하고, 나머지는 @ModelAttribute(argument resolver로 지정해둔 타입 외)을 적용한다,
+따라서 이 경우 HelloData에 @RequestBody를 생략해버리면 @ModelAttribute가 적용된다. 
+@ModelAttribute HelloData data. 이렇게 되면 Http 메시지 Body가 아니라 처음에 공부했던 요청 파라미터를 처리하게 된다.
+그래서 username=null,age=0 이 log에 찍혔던 것이다.
 
+따라서 생략하면 HTTP 메시지 바디가 아니라 요청 파라미터를 처리하게 된다.
 
+추가로 반환 타입을 객체로 하여서 HelloData 객체가 Http message converter에 의해서 json으로 바뀌어서 바뀐 json문자가 Http 메시지 응답에 넣어져서 응답으로 나간다. 
+```java
+@ResponseBody
+@PostMapping("/request-body-json-v5")
+public HelloData requestBodyJsonV5(@RequestBody HelloData helloData) {
+    log.info("username={},age={}", helloData.getUsername(), helloData.getAge());
+    return helloData;
+}
+```
+postman으로 POST요청을 보내본 결과 아래와 같이 결과가 나왔다. 
+```json
+{
+    "username": "hello",
+    "age": 240
+}
+```
+json이 객체가 되었다가, 객체가 반환될 때 다시 json이 되서 저렇게 응답이 나온 것이다.
 
+- @RequestBody 요청
+  - JSON 요청 -> Http message converter -> 객체
+  - JSON 으로 요청한 것이 JSON을 처리하는 Http message converter가 실행이 되서 객체로 바꾸고 그것이 인자 data(@RequestBody HelloData data)로 전달된다.
 
+- @ResponseBody 응답
+  - 객체 -> Http message converter -> JSON 응답
+  - 응답은 객체가 JSON을 처리하는 Http message converter가 실행이 되서 JSON으로 응답을 해서 나가게 된다.
 
-
-
+잠깐 헷갈리는 부분이 있어서 @RequestBody를 사용할 때와 HttpEntity를 사용할 때의 차이점을 다시 정리해보았다.
+@RequestBody는 HTTP 요청 본문의 내용만 객체로 변환하여 처리하는 데 사용된다.
+HttpEntity는 HTTP 요청의 본문과 헤더 모두에 액세스하려는 경우에 사용된다.
 
 
 
