@@ -13,7 +13,6 @@ import java.util.List;
 public class MemberService {
     @Autowired MemberRepository memberRepository;
 
-
     /**
      * 회원가입
      */
@@ -36,6 +35,18 @@ public class MemberService {
     }
     public Member findOne(Long memberId) {
         return memberRepository.findOne(memberId);
+    }
+
+    /**
+     * update메소드의 반환 값을 Member객체로 해도 되지만 '커맨드와 쿼리를 분리' 하자.
+     * update는 변경성 메소드, Member를 반환형으로 두면 id로 조회하는 꼴이 된다. => 커맨드와 쿼리가 같이 있는 꼴
+     * update 같은 것들은 가급적이면 그 안에서 끝내자.
+     * 'CQS'패턴
+     */
+    @Transactional
+    public void update(Long id, String name) {
+        Member findMember = memberRepository.findOne(id);
+        findMember.setName(name);
     }
 }
 
