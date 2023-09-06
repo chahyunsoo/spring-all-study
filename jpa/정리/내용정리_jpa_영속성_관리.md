@@ -52,8 +52,8 @@ em.persist(memberB);
 transaction.commit(); // Transaction 커밋
 ```
 
-- <property name="hibernate.jdbc.batch_size" value="10"/>
-  - 배치 사이즈를 10으로 설정하면, 이 사이즈 만큼 모아서 DB에 한번에 보내고 commit을 한다.(버퍼링같은 개념)
+- 배치 사이즈를 10으로 설정하면, 이 사이즈 만큼 모아서 DB에 한번에 보내고 commit을 한다.(버퍼링같은 개념)
+  `<property name="hibernate.jdbc.batch_size" value="10"/>`
 
 ### 엔티티를 수정할때 변경 감지
 
@@ -101,7 +101,7 @@ update 쿼리를 쓰기 지연 저장소에 만들어 둔다. 그리고 이 upda
     List<Memeber> members = query.getResultList;
     ``` 
     원래 알던 내용을 토대로 생각했을때, em.persist()를 호출하면 아직 DB에 insert 쿼리가 날라가기 전이다. 하지만 아래에 JPQL을 통해 select 쿼리를 호출하게 되면 아직 DB에 저장된 것이 없으니 불러올 값이 없을 것이다.
-    이 부분에서 문제가 생길 수 있기 때문에, jpa는 **JPQL 쿼리를 실행했을시 자동으로 플러시를 발생**시키고 그 다음 DB에 쿼리가 날라가게 해두었다. 그래서 meber A B C가 조회가 된다.
+    이 부분에서 문제가 생길 수 있기 때문에, jpa는 **JPQL 쿼리를 실행했을시 자동으로 플러시를 발생**시키고 그 다음 DB에 쿼리가 날라가게 해두었다. 그래서 member 1 2 3이 조회가 된다.
 
 - 결론적으로 플러시는 영속성 컨텍스트를 비우지 않는다
 - **영속성 컨텍스트의 변경 내용을 DB에 동기화하는게 플러시다.**
