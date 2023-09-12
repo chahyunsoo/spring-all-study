@@ -5,6 +5,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.util.List;
 
 public class jpaMain {
     public static void main(String[] args) {
@@ -20,7 +21,6 @@ public class jpaMain {
 
             Member member = new Member();
             member.setUsername("member1");
-
             member.setTeam(team);
 
 //            member.setTeamId(team.getId()); // -> 뭔가 객체지향스럽지 않음, 이것은 f.k를 직접 다루는 상황
@@ -28,13 +28,15 @@ public class jpaMain {
             em.flush();
             em.clear(); //영속성 컨텍스트 초기화 시키고 아래 코드에서 다시 find하면 select DDL 확인 가능
 
-            //조회할때도 문제가 생김
+            //조회할 때도 문제가 생김
             Member findMember = em.find(Member.class, member.getId());
 //            Long teamId = findMember.getTeamId();
 //            Team findTeam = em.find(Team.class, teamId);
 
-            Team findTeam = findMember.getTeam();
-            System.out.println("fi ndTeam.getName() = " + findTeam.getName());
+            List<Member> members = findMember.getTeam().getMembers();
+            for (Member m : members) {
+                System.out.println("m.getUsername() = " + m.getUsername());
+            }
 
 
             tx.commit();

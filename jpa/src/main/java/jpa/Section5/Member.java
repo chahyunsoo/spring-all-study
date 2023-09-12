@@ -17,9 +17,11 @@ public class Member {
 //    @Column(name = "TEAM_ID")
 //    private Long teamId;
     @ManyToOne
-    @JoinColumn(name = "TEAM_ID")
+    @JoinColumn(name = "TEAM_ID") //DB에 값을 넣을 때는 이것만 참조!
     private Team team;
-    public Member() {}
+    public Member() {
+
+    }
 
 }
 

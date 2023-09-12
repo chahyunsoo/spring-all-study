@@ -23,8 +23,8 @@ public class jpaMain {
 
         try {
 
-            Order order = em.find(Order.class, 1L);
-            Member member = order.getMember();
+//            Order order = em.find(Order.class, 1L);
+//            Member member = order.getMember();
 
 
             tx.commit();
