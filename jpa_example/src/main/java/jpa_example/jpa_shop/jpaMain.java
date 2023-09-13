@@ -2,6 +2,7 @@ package jpa_example.jpa_shop;
 
 import jpa_example.jpa_shop.domain.Member;
 import jpa_example.jpa_shop.domain.Order;
+import jpa_example.jpa_shop.domain.OrderItem;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -22,9 +23,8 @@ public class jpaMain {
         tx.begin();
 
         try {
-
-//            Order order = em.find(Order.class, 1L);
-//            Member member = order.getMember();
+            Order order = new Order();
+            order.addOrderItem(new OrderItem());
 
 
             tx.commit();
