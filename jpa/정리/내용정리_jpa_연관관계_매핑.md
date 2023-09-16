@@ -55,7 +55,7 @@ public class Member {
 현재 Member와 Team은 N:1 관계이다.(하나의 팀에 여려명의 사람이 들어갈 수 있다는 조건하에) -> @ManyToOne
 Team team과 실제 Member 테이블의 TEAM_ID(외래키)컬럼과 매핑을 해야하기 때문에 -> @JoinColumn(name = "TEAM_ID")
 
-![img.png](img.png)
+![img.png](img/img.png)
 
 **객체의 참조와 DB의 외래키를 매핑을 해서 연관관계 매핑을 할 수 있다.**
 
