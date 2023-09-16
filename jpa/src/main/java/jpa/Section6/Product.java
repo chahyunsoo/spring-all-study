@@ -11,21 +11,16 @@ import java.util.List;
 @Entity
 @Getter @Setter
 @NoArgsConstructor
-public class Member {
+public class Product {
+
     @Id @GeneratedValue
-    @Column(name = "MEMBER_ID")
     private Long id;
-    @Column(name = "USERNAME")
-    private String username;
+    private String name;
 
-    @OneToOne
-    @JoinColumn(name = "LOCKER_ID")
-    private Locker locker;
-
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "product")
     private List<MemberProduct> memberProducts = new ArrayList<>();
 
 
+
+
 }
-
-

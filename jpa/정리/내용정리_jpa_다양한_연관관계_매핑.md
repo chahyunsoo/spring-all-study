@@ -90,6 +90,27 @@ DB 설계할 때 N쪽에 F.K가 와야 하는 것은 당연함!
 
 ![img_5.png](img/img_5.png)
 
+---
+
+#### 다대다
+
+- 중간 테이블을 두어서 일대다, 다대일 관계로 풀어야 한다.
+- @JoinTable로 연결 테이블을 지정할 수 있다.
+- @ManyToMany를 @OneToMany , @ManyToOne로 나눠서 사용함.
+- 다대다 매핑은 실무에서 사용하지 않아야 한다.
+
+![img.png](img/img_6.png)
+
+MEMBER_ID 와 PRODUCT_ID를 묶어서 P.K로 할 수도 있지만,
+비즈니스 적으로 의미없는 P.K(ORDER_ID)를 하나 추가로 설정하는게 유연성 측면에서 더 좋음.
+모든 테이블에 일관성 있게 @GeneratedValue를 설정함.
+
+---
+
+
+
+
+
 
 
 
