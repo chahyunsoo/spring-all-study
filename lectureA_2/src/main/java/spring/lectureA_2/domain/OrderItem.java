@@ -6,23 +6,25 @@ import lombok.Setter;
 import spring.lectureA_2.domain.item.Item;
 
 @Table(name = "order_item")
-@Getter
-@Setter
+@Getter @Setter
 @Entity
 public class OrderItem {
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue
     @Column(name = "order_item_id")
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private Order order; //주문
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private Item item; //주문 상품
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
-    private Order order; //주문
+    @Column(name = "order_price")
     private int orderPrice; //주문 가격
+
+    @Column(name = "count")
     private int count; //주문 수량
 
     //==생성 메서드==//

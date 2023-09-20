@@ -11,11 +11,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "orders")
-@Getter
-@Setter
+@Getter @Setter
 public class Order {
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue
     @Column(name = "order_id")
     private Long id;
 
@@ -30,23 +28,28 @@ public class Order {
     @JoinColumn(name = "delivery_id")
     private Delivery delivery; //배송정보
 
+    @Column(name = "order_date")
     private LocalDateTime orderDate; //주문시간 @Enumerated(EnumType.STRING)
 
+    @Column(name = "status")
     private OrderStatus status; //주문상태 [ORDER, CANCEL]
 
-    //==연관관계 메서드==//
+    //==연관관계 메서드==//  => 연관관계 편의 메소드는 양방향일때 핵심적으로 컨트롤 하는 쪽에서 들고 있는 것이 좋다. 
     public void setMember(Member member) {
         this.member = member;
         member.getOrders().add(this);
     }
+
     public void addOrderItem(OrderItem orderItem) {
         orderItems.add(orderItem);
         orderItem.setOrder(this);
     }
+
     public void setDelivery(Delivery delivery) {
         this.delivery = delivery;
         delivery.setOrder(this);
     }
+
 
     //==생성 메서드==//
     public static Order createOrder(Member member, Delivery delivery,OrderItem... orderItems) {
