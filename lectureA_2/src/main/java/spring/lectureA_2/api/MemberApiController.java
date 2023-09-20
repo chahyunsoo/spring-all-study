@@ -9,6 +9,7 @@ import spring.lectureA_2.service.MemberService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 //@Controller @ResponseBody
@@ -93,9 +94,9 @@ public class MemberApiController {
             @RequestBody @Valid UpdateMemberRequest request) {
 
         memberService.update(id, request.getName());
-        Member member = memberService.findOne(id); // -> 쿼리를 별도로 짬.
+        Optional<Member> member = memberService.findOne(id); // -> 쿼리를 별도로 짬.
 
-        UpdateMemberResponse updateMemberResponse = new UpdateMemberResponse(member.getId(), member.getName());
+        UpdateMemberResponse updateMemberResponse = new UpdateMemberResponse(member.get().getId(), member.get().getName());
         return updateMemberResponse;
     }
 
