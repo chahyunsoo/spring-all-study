@@ -20,7 +20,4 @@ public class Product {
     @OneToMany(mappedBy = "product")
     private List<MemberProduct> memberProducts = new ArrayList<>();
 
-
-
-
 }

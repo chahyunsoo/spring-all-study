@@ -13,7 +13,7 @@ import java.util.List;
 @Getter @Setter
 @Table(name = "ORDERS")
 public class Order {
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ORDER_ID")
     private Long id;
 
@@ -31,7 +31,7 @@ public class Order {
      * delivery 엔티티의 PK를 외래키 컬럼인 Delivery_Id에 저장하게 됩니다.
      */
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order")  //양방향 맞춰줌
     private List<OrderItem> orderItems = new ArrayList<>();
 
     @Column(name = "ORDER_DATE")

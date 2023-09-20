@@ -27,5 +27,5 @@ public class Delivery {
     private DeliveryStatus deliveryStatus;
 
     @OneToOne(mappedBy = "delivery")  //어떤 주문에 의해서 배송이 됐는지 알고 싶으면
-    private Order orders;
+    private Order order;
 }
