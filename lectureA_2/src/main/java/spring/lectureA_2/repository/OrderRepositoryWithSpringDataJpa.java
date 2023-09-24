@@ -7,4 +7,5 @@ import spring.lectureA_2.domain.Order;
 @Repository
 public interface OrderRepositoryWithSpringDataJpa extends JpaRepository<Order,Long> {
 
+
 }

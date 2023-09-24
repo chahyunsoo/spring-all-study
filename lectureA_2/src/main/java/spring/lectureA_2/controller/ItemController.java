@@ -109,7 +109,7 @@ public class ItemController {
      */
     @GetMapping("/items/book/{id}/edit")
     public String updateBookItemForm(@PathVariable("id") Long id, Model model) {
-        Book item = (Book) itemService.findOne(id);
+        Book item = (Book) (itemService.findOne(id).get());
 
         BookForm form = new BookForm();
         form.setId(item.getId());
@@ -125,7 +125,7 @@ public class ItemController {
 
     @GetMapping("/items/movie/{id}/edit")
     public String updateMovieForm(@PathVariable("id") Long id, Model model) {
-        Movie item = (Movie) itemService.findOne(id);
+        Movie item = (Movie) (itemService.findOne(id).get());
 
         MovieForm form = new MovieForm();
         form.setId(item.getId());
@@ -141,7 +141,7 @@ public class ItemController {
 
     @GetMapping("/items/album/{id}/edit")
     public String updateAlbumForm(@PathVariable("id") Long id, Model model) {
-        Album item = (Album) itemService.findOne(id);
+        Album item = (Album) (itemService.findOne(id).get());
 
         Album form = new Album();
         form.setId(item.getId());
