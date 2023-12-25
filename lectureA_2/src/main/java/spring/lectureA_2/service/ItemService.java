@@ -16,28 +16,28 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ItemService {
 
-//    @Autowired private final ItemRepository itemRepository;
-    private final ItemRepositoryWithSpringDataJpa itemRepositoryWithSpringDataJpa;
+    @Autowired private final ItemRepository itemRepository;
+//    private final ItemRepositoryWithSpringDataJpa itemRepositoryWithSpringDataJpa;
 
     @Transactional
     public void saveItem(Item item) {
-        itemRepositoryWithSpringDataJpa.save(item);
+        itemRepository.save(item);
     }
 
     @Transactional
     public void updateItem(Long itemId,String name,int price,int stockQuantity) {
-        Optional<Item> findItem = itemRepositoryWithSpringDataJpa.findOne(itemId);
+        Item findItem = itemRepository.findOne(itemId);
 
-        findItem.get().setName(name);
-        findItem.get().setPrice(price);
-        findItem.get().setStockQuantity(stockQuantity);
+        findItem.setName(name);
+        findItem.setPrice(price);
+        findItem.setStockQuantity(stockQuantity);
     }
 
     public List<Item> findItems() {
-        return itemRepositoryWithSpringDataJpa.findAll();
+        return itemRepository.findAll();
     }
-    public Optional<Item> findOne(Long itemId) {
-        return itemRepositoryWithSpringDataJpa.findOne(itemId);
+    public Item findOne(Long itemId) {
+        return itemRepository.findOne(itemId);
     }
 }
 

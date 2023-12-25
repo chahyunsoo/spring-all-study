@@ -19,7 +19,23 @@ public class OrderRepository {
     public void save(Order order) {
         em.persist(order);
     }
-    public Order findOneOrder(Long id) {
+//
+//        return em.createQuery(jpql, Order.class)
+//                .setParameter("status", orderSearch.getOrderStatus())
+//                .setParameter("name", orderSearch.getMemberName())
+//                .setMaxResults(1000) //최대 1000건
+//                .getResultList();
+//    }
+
+//
+//        return em.createQuery(jpql, Order.class)
+//                .setParameter("status", orderSearch.getOrderStatus())
+//                .setParameter("name", orderSearch.getMemberName())
+//                .setMaxResults(1000) //최대 1000건
+//                .getResultList();
+//    }
+
+    public Order findOne(Long id) {
         return em.find(Order.class, id);
     }
 

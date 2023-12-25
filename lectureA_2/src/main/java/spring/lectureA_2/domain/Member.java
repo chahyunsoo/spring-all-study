@@ -22,7 +22,7 @@ public class Member {
     @Embedded
     private Address address;
 
-//    @JsonIgnore
+    @JsonIgnore //Entity에 의존관계가 들어와야 하는데 지금 의존관계가 나가는 상태
     @OneToMany(mappedBy = "member")
     private List<Order> orders = new ArrayList<>();
 

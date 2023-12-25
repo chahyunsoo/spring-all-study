@@ -27,7 +27,8 @@ public class MemberApiController {
      * v1은 Entity가 변경되면 API 스펙이 변경된다.
      *
      * 그래서 API 응답 스펙에 맞춰 DTO를 반환해야 한다.
-     * @return
+     *
+     * v1은 배열을 바로 반환하는데 이러면 스펙 확장이 어려워지고 유연성이 떨어짐
      */
     @GetMapping("/api/v1/members")
     public List<Member> membersV1() {
@@ -39,18 +40,17 @@ public class MemberApiController {
     public Result membersV2() {
         List<Member> findMembers = memberService.findMembers();
 
-        List<MemberDto> collect = new ArrayList<>();
-        for (Member findMember : findMembers) {
-            MemberDto memberDto = new MemberDto(findMember.getName());
-            collect.add(memberDto);
-        }
+//        List<MemberDto> collect = new ArrayList<>();
+//        for (Member findMember : findMembers) {
+//            MemberDto memberDto = new MemberDto(findMember.getName());
+//            collect.add(memberDto);
+//        }
 
-//        List<MemberDto> collect = findMembers.stream()
-//                .map(m -> new MemberDto(m.getName()))
-//                .collect(Collectors.toList());
+        List<MemberDto> collect = findMembers.stream()
+                .map(member -> new MemberDto((member.getName())))
+                .collect(Collectors.toList());
 
-        Result result = new Result(collect);
-        return result;
+        return new Result(collect);
     }
 
     //첫번째 버전의 회원 등록 api
@@ -94,9 +94,9 @@ public class MemberApiController {
             @RequestBody @Valid UpdateMemberRequest request) {
 
         memberService.update(id, request.getName());
-        Optional<Member> member = memberService.findOne(id); // -> 쿼리를 별도로 짬.
+        Member member = memberService.findOne(id); // -> 쿼리를 별도로 짬.
 
-        UpdateMemberResponse updateMemberResponse = new UpdateMemberResponse(member.get().getId(), member.get().getName());
+        UpdateMemberResponse updateMemberResponse = new UpdateMemberResponse(member.getId(), member.getName());
         return updateMemberResponse;
     }
 

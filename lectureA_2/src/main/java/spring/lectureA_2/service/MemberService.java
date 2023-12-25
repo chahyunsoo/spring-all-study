@@ -36,10 +36,10 @@ public class MemberService {
     /**
      * 생성자 주입
      */
-    private final MemberRepositoryWithSpringDataJpa memberRepositoryWithSpringDataJpa;
+    private final MemberRepository memberRepository;
     @Autowired  //생성자가 1개만 있는 경우 @Autowired를 안써도 가능
-    public MemberService(MemberRepositoryWithSpringDataJpa memberRepositoryWithSpringDataJpa) {
-        this.memberRepositoryWithSpringDataJpa = memberRepositoryWithSpringDataJpa;
+    public MemberService(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
     }
 
     /**
@@ -48,11 +48,11 @@ public class MemberService {
     @Transactional //변경
     public Long join(Member member) {
         validateDuplicateMember(member); //중복 회원 검증
-        memberRepositoryWithSpringDataJpa.save(member);
+        memberRepository.save(member);
         return member.getId();
     }
     private void validateDuplicateMember(Member member) {
-        List<Member> findMembers = memberRepositoryWithSpringDataJpa.findByName(member.getName());
+        List<Member> findMembers = memberRepository.findByName(member.getName());
         if (!findMembers.isEmpty()) {
             throw new IllegalStateException("이미 존재하는 회원입니다.");
         }
@@ -63,10 +63,10 @@ public class MemberService {
      *전체 회원 조회
      */
     public List<Member> findMembers() {
-        return memberRepositoryWithSpringDataJpa.findAll();
+        return memberRepository.findAll();
     }
-    public Optional<Member> findOne(Long memberId) {
-        return memberRepositoryWithSpringDataJpa.findOne(memberId);
+    public Member findOne(Long memberId) {
+        return memberRepository.findOne(memberId);
     }
 
     /**
@@ -77,8 +77,8 @@ public class MemberService {
      */
     @Transactional
     public void update(Long id, String name) {
-        Optional<Member> findMember = memberRepositoryWithSpringDataJpa.findOne(id);
-        findMember.get().setName(name);
+        Member findMember = memberRepository.findOne(id);
+        findMember.setName(name);
     }
 }
 

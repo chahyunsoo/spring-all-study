@@ -5,10 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import spring.lectureA_2.domain.*;
 import spring.lectureA_2.domain.item.Item;
-import spring.lectureA_2.repository.ItemRepository;
-import spring.lectureA_2.repository.MemberRepository;
-import spring.lectureA_2.repository.OrderRepository;
-import spring.lectureA_2.repository.OrderSearch;
+import spring.lectureA_2.repository.*;
 
 import java.util.List;
 
@@ -19,6 +16,10 @@ public class OrderService {
     private final MemberRepository memberRepository;
     private final OrderRepository orderRepository;
     private final ItemRepository itemRepository;
+
+//    private final MemberRepositoryWithSpringDataJpa memberRepositoryWithSpringDataJpa;
+//    private final OrderRepositoryWithSpringDataJpa orderRepositoryWithSpringDataJpa;
+//    private final ItemRepositoryWithSpringDataJpa itemRepositoryWithSpringDataJpa;
 
     /**
      * 주문
@@ -51,7 +52,7 @@ public class OrderService {
     @Transactional
     public void cancelOrder(Long orderId) {
         //주문 엔티티 조회
-        Order order = orderRepository.findOneOrder(orderId);
+        Order order = orderRepository.findOne(orderId);
         //주문 취소
         order.cancel();
     }

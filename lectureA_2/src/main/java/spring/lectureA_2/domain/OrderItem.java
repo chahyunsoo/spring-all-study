@@ -1,13 +1,16 @@
 package spring.lectureA_2.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import spring.lectureA_2.domain.item.Item;
 
 @Table(name = "order_item")
 @Getter @Setter
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OrderItem {
     @Id @GeneratedValue
     @Column(name = "order_item_id")
@@ -33,6 +36,7 @@ public class OrderItem {
         orderItem.setItem(item);
         orderItem.setOrderPrice(orderPrice);
         orderItem.setCount(count);
+        //orderItem을 생성하면 기존 Item의 제고를 감소시켜줘야 하니까
         item.removeStock(count);
         return orderItem;
     }
