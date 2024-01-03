@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 import spring.lectureA_2.domain.Member;
 import spring.lectureA_2.domain.Order;
+import spring.lectureA_2.repository.order.simplequery.OrderSimpleQueryDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -124,5 +125,6 @@ public class OrderRepository {
                         " join fetch o.delivery d", Order.class
         ).getResultList();
     }
+
 
 }

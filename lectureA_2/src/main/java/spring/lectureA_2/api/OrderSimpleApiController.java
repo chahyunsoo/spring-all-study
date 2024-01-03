@@ -9,6 +9,8 @@ import spring.lectureA_2.domain.Order;
 import spring.lectureA_2.domain.OrderStatus;
 import spring.lectureA_2.repository.OrderRepository;
 import spring.lectureA_2.repository.OrderSearch;
+import spring.lectureA_2.repository.order.simplequery.OrderSimpleQueryDto;
+import spring.lectureA_2.repository.order.simplequery.OrderSimpleQueryRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +24,7 @@ import java.util.stream.Collectors;
 public class OrderSimpleApiController {
 
     private final OrderRepository orderRepository;
+    private final OrderSimpleQueryRepository orderSimpleQueryRepository;
 
     @GetMapping("/api/v1/simple-orders")
     public List<Order> ordersV1() {
@@ -47,6 +50,11 @@ public class OrderSimpleApiController {
         List<Order> orders = orderRepository.findAllWithMemberDelivery();
         List<SimpleOrderDto> collect = orders.stream().map(m -> new SimpleOrderDto(m)).collect(Collectors.toList());
         return collect;
+    }
+
+    @GetMapping("/api/v4/simple-orders")
+    public List<OrderSimpleQueryDto> ordersV4() {
+        return orderSimpleQueryRepository.findOrderDtos();
     }
 
 
