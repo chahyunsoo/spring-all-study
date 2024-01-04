@@ -8,6 +8,7 @@ import spring.lectureA_2.domain.Address;
 import spring.lectureA_2.domain.Order;
 import spring.lectureA_2.domain.OrderItem;
 import spring.lectureA_2.domain.OrderStatus;
+import spring.lectureA_2.domain.item.Item;
 import spring.lectureA_2.repository.OrderRepository;
 import spring.lectureA_2.repository.OrderSearch;
 
@@ -41,6 +42,17 @@ public class OrderApiController {
         List<OrderDto> collect = orders.stream().map(o -> new OrderDto(o)).collect(Collectors.toList());
         return collect;
     }
+
+    @GetMapping("/api/v3/orders")
+    public List<OrderDto> ordersV3() {
+        List<Order> orders = orderRepository.findAllWithItem();
+        for (Order order : orders) {
+            System.out.println("order = " + order);
+        }
+        List<OrderDto> collect = orders.stream().map(o -> new OrderDto(o)).collect(Collectors.toList());
+        return collect;
+    }
+
 
     @Data
     static class OrderDto {

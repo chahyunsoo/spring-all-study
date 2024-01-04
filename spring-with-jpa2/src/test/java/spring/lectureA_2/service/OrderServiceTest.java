@@ -35,7 +35,7 @@ class OrderServiceTest {
         Long orderId = orderService.order(member.getId(), book.getId(), orderCount);
 
         //then
-        Order getOrder = orderRepository.findOneOrder(orderId);
+        Order getOrder = orderRepository.findOne(orderId);
 
         assertEquals("상품 주문시 상태는 ORDER", OrderStatus.ORDER,getOrder.getStatus());
         assertEquals("주문한 상품 종류 수가 정확해야 한다",1,getOrder.getOrderItems().size());
