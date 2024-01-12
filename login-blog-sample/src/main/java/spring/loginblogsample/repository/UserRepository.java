@@ -2,15 +2,15 @@ package spring.loginblogsample.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import spring.loginblogsample.domain.Member;
+import spring.loginblogsample.domain.User;
 
 import java.util.Optional;
 
 @Repository
-public interface MemberRepository extends JpaRepository<Member,Long> {
+public interface UserRepository extends JpaRepository<User,Long> {
     boolean existsByLoginId(String loginId);
 
-    boolean existsByNickName(String nickname);
+    boolean existsByNickname(String nickname);
 
-    Optional<Member> findByLoginId(String loginId);
+    Optional<User> findByLoginId(String loginId);
 }

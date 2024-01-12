@@ -1,5 +1,5 @@
 package spring.loginblogsample.domain;
 
-public enum MemberRole {
+public enum UserRole {
     USER,ADMIN
 }
