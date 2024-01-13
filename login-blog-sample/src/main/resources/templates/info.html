@@ -10,9 +10,9 @@
   <h1><a th:href="|/${loginType}|">[[${pageName}]]</a></h1> <hr/>
   <h2>유저 정보</h2>
   <div>
-    <div th:text="|loginId : ${member.loginId}|"/>
-    <div th:text="|nickname : ${member.nickname}|"/>
-    <div th:text="|role : ${member.role}|"/>
+    <div th:text="|loginId : ${user.loginId}|"/>
+    <div th:text="|nickname : ${user.nickname}|"/>
+    <div th:text="|role : ${user.userRole}|"/>
   </div>
 </div>
 </body>

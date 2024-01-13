@@ -4,10 +4,12 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import spring.loginblogsample.domain.User;
 import spring.loginblogsample.domain.UserRole;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class JoinRequest {
@@ -30,21 +32,32 @@ public class JoinRequest {
                 .nickname(this.nickname)
                 .userRole(UserRole.USER)
                 .build();
-//        member.getMemberRoleSet().add(MemberRole.USER);
-//        member.getMemberRoleSet().add(MemberRole.ADMIN);
+////        member.getMemberRoleSet().add(MemberRole.USER);
+////        member.getMemberRoleSet().add(MemberRole.ADMIN);
     }
 
-    //암호화된 비밀번호
-    public User toEntityWithEncodedPassword(String encodedPassword) {
-        User user = User.builder()
+    public User toEntityWithOutEncodedPasswordForAdmin() {
+        return User.builder()
                 .loginId(this.loginId)
-                .password(encodedPassword)
+                .password(this.password)
                 .nickname(this.nickname)
-                .userRole(UserRole.USER)
+                .userRole(UserRole.ADMIN)
                 .build();
-//        member.getMemberRoleSet().add(MemberRole.USER);
-//        member.getMemberRoleSet().add(MemberRole.ADMIN);
-        return user;
+////        member.getMemberRoleSet().add(MemberRole.USER);
+////        member.getMemberRoleSet().add(MemberRole.ADMIN);
     }
+//
+//    //암호화된 비밀번호
+//    public User toEntityWithEncodedPassword(String encodedPassword) {
+//        User user = User.builder()
+//                .loginId(this.loginId)
+//                .password(encodedPassword)
+//                .nickname(this.nickname)
+//                .userRole(UserRole.USER)
+//                .build();
+////        member.getMemberRoleSet().add(MemberRole.USER);
+////        member.getMemberRoleSet().add(MemberRole.ADMIN);
+//        return user;
+//    }
 
 }
