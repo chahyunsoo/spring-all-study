@@ -53,7 +53,7 @@ public class UserService {
     }
 
     //userId를 이용하여 User return -> 추후 인증, 인가 시 사용예정
-    public User returnByUserId(Long userId) {
+    public User returnUserByUserId(Long userId) {
         if (userId == null) {
             return null;
         }
@@ -64,7 +64,7 @@ public class UserService {
     }
 
     //loginId를 이용하여 User return -> 추후 인증, 인가 시 사용예정
-    public User returnByLoginId(String loginId) {
+    public User returnUserByLoginId(String loginId) {
         if (loginId == null) {
             return null;
         }
