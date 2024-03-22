@@ -114,7 +114,6 @@ public class SessionLoginController {
 
         //세션이 없으면 세션을 생성함
         HttpSession session = httpServletRequest.getSession(true);
-        System.out.println("session.getId() = " + session.getId());
 
         //세션에 Key 넣음
         session.setAttribute("userSessionId", loginUser.getUserId());
@@ -144,7 +143,7 @@ public class SessionLoginController {
 
     @GetMapping("/info")
     public String userInfo(@SessionAttribute(name = "userSessionId") Long userId, Model model) {
-        model.addAttribute("loginType", "cookie-login");
+        model.addAttribute("loginType", "session-login");
         model.addAttribute("pageName", "쿠키를 사용한 로그인 방식");
 
         User loginUser = userService.returnUserByUserId(userId);
